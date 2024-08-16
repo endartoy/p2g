@@ -662,7 +662,7 @@ function tesApp() {
 
             // Listen for new items in the database
             let isFirstLoad = true;
-            db.collection('_sinoman').where('chanel', '==', this.newItem.chanel).onSnapshot(snapshot => {
+            db.collection('_sinoman').onSnapshot(snapshot => {
 
                 if (isFirstLoad) {
                     isFirstLoad = false;
@@ -670,42 +670,44 @@ function tesApp() {
                 }
 
                 snapshot.docChanges().forEach(change => {
-                    if (change.type === 'added') {
-                        let i = change.doc.data();
-                        if (i.user !== this.userName) {   
-                            let text = i.user;
-
-                            text += i._note ? ' : '+i._note : '';
-                            if (i.makan > 0 || i.makan > 0) {
-                                text += ' * MINUM : '+ i.minum + ' || MAKAN : '+ i.makan
-                            }
-
-                            if (Notification.permission === 'granted') {
-                                new Notification(text, {
-                                    icon: '../public/img/logo_p2g.png'
-                                });
-                            } else if (Notification.permission !== 'denied') {
-                                Notification.requestPermission() 
+                    if (change.doc.data().chanel === this.newItem.chanel) {
+                        if (change.type === 'added') {
+                            let i = change.doc.data();
+                            if (i.user !== this.userName) {   
+                                let text = i.user;
+    
+                                text += i._note ? ' : '+i._note : '';
+                                if (i.makan > 0 || i.makan > 0) {
+                                    text += ' * MINUM : '+ i.minum + ' || MAKAN : '+ i.makan
+                                }
+    
+                                if (Notification.permission === 'granted') {
+                                    new Notification(text, {
+                                        icon: '../public/img/logo_p2g.png'
+                                    });
+                                } else if (Notification.permission !== 'denied') {
+                                    Notification.requestPermission() 
+                                }
                             }
                         }
-                    }
-
-                    if (change.type === 'modified') {
-                        let i = change.doc.data();
-                        if (i.p_user === '' && i.user !== this.userName) {
-                            let text = i.user;
-
-                            text += i._note ? ' : '+i._note : '';
-                            if (i.makan > 0 || i.makan > 0) {
-                                text += ' * MINUM : '+ i.minum + ' || MAKAN : '+ i.makan
-                            }
-
-                            if (Notification.permission === 'granted') {
-                                new Notification(text, {
-                                    icon: '../public/img/logo_p2g.png'
-                                });
-                            } else if (Notification.permission !== 'denied') {
-                                Notification.requestPermission() 
+    
+                        if (change.type === 'modified') {
+                            let i = change.doc.data();
+                            if (i.p_user === '' && i.user !== this.userName) {
+                                let text = i.user;
+    
+                                text += i._note ? ' : '+i._note : '';
+                                if (i.makan > 0 || i.makan > 0) {
+                                    text += ' * MINUM : '+ i.minum + ' || MAKAN : '+ i.makan
+                                }
+    
+                                if (Notification.permission === 'granted') {
+                                    new Notification(text, {
+                                        icon: '../public/img/logo_p2g.png'
+                                    });
+                                } else if (Notification.permission !== 'denied') {
+                                    Notification.requestPermission() 
+                                }
                             }
                         }
                     }
