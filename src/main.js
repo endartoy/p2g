@@ -638,7 +638,7 @@ function userPage() {
 
 function tesApp() {
     const initialItem = {
-        chanel: localStorage.getItem('stored_chanel') || '1',
+        chanel: localStorage.getItem('stored_chanel') || '3',
         user: '',
         p_user: '',
         minum: 0,
