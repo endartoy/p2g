@@ -246,6 +246,8 @@ function kasP2g() {
         },
 
         openForm(kas) {
+            if (!ndrtApp().doCRUD) return;
+            
             if (kas) {
                 this.newKas = { ...kas };
                 this.newKas.jumlah = this.viewRupiah(this.newKas.jumlah);
