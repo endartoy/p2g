@@ -136,11 +136,6 @@ function kasP2g() {
         // prop
         form: false,
 
-        // user login info
-        user: null,
-        userRole: '',
-        // doCRUD: false,
-
         // kas P2g
         filterTanggal: '',
         kasList: [],
@@ -153,25 +148,6 @@ function kasP2g() {
             const filterDate = new Date().setMonth(0,1);
             this.filterTanggal = this.formatDate(filterDate);
             this.newKas.tanggal = this.formatDate();
-        },
-
-        // page
-        switchPage(x_page) {
-            if (x_page === 'kas p2g') {
-                this.doCRUD = ['superadmin', 'admin'].includes(this.userRole);
-
-                this.readKas();
-                const filterDate = new Date().setMonth(0,1);
-                this.filterTanggal = this.formatDate(filterDate);
-                this.newKas.tanggal = this.formatDate();
-            }
-            if (x_page === 'user page') {
-                this.readUsers();
-            }
-
-            this.page = x_page;
-            localStorage.setItem('stored_page', x_page);
-            Alpine.store('isLoading', false);
         },
 
         // PROP KAS
@@ -246,7 +222,8 @@ function kasP2g() {
         },
 
         openForm(kas) {
-            if (!ndrtApp().doCRUD) return;
+            const doCRUD = ['superadmin', 'admin'].includes(Alpine.store('user_info').userRole);
+            if (!doCRUD) return;
             
             if (kas) {
                 this.newKas = { ...kas };
