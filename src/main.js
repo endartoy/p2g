@@ -24,7 +24,7 @@ document.addEventListener('alpine:init', () => {
         type: 'is-info', 
         text: '' ,
 
-        showMessage(text, type = '') {
+        showMessage(text, type = '', time = 5000) {
             this.text = text;
             this.type = type === '' ? 'is-info' : 'is-danger';
             this.class = true;
@@ -32,7 +32,7 @@ document.addEventListener('alpine:init', () => {
                 this.class = false;
                 this.text = '';
                 this.type = '';
-            }, 5000);
+            }, time);
         },
     });
 
@@ -66,6 +66,8 @@ function ndrtApp() {
         doCRUD: false,
 
         init() {
+            if (!navigator.onLine) Alpine.store('message').showMessage("Tidak ada koneksi internet", 'error'); return;
+
             auth.onAuthStateChanged(async user => {
                 if (user) {
                     const docID = user.uid;
@@ -100,7 +102,7 @@ function ndrtApp() {
                 }
             })
 
-            // Alpine.store('isLoading', false);
+            Alpine.store('isLoading', false);
         },
 
         // page
@@ -641,14 +643,6 @@ function userPage() {
                     Alpine.store('isLoading', false);
                 });
             }
-        }
-    }
-}
-
-function arisan() {
-    return {
-        init() {
-            console.log(ndrtApp().doArisan);
         }
     }
 }

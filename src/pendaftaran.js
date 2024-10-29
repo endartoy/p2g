@@ -24,7 +24,7 @@ document.addEventListener('alpine:init', () => {
         type: 'is-info', 
         text: '' ,
 
-        showMessage(text, type = '') {
+        showMessage(text, type = '', time = 5000) {
             this.text = text;
             this.type = type === '' ? 'is-info' : 'is-danger';
             this.class = true;
@@ -32,7 +32,7 @@ document.addEventListener('alpine:init', () => {
                 this.class = false;
                 this.text = '';
                 this.type = '';
-            }, 5000);
+            }, time);
         },
     });
 
@@ -62,7 +62,35 @@ function ndrtApp() {
         dataList: [],
 
         init() {
-            this.switchPage(Alpine.store('page'));
+            if (!navigator.onLine) Alpine.store('message').showMessage("Tidak ada koneksi internet", 'error'); return;
+
+            auth.onAuthStateChanged(async user => {
+                if (user) {
+                    const docID = user.uid;
+                    
+                    const rolesRef = firebase.firestore().collection('roles').doc(docID);
+                    const rolesDoc = await rolesRef.get();
+
+                    if (rolesDoc.data().role === 'tps') {
+                        Alpine.store('user_info').user = user;
+                        localStorage.setItem('stored_user', user);
+
+                        Alpine.store('user_info').userRole = rolesDoc.data().role;
+                        localStorage.setItem('stored_userRole', rolesDoc.data().role);
+
+                        this.switchPage(Alpine.store('page'));
+                    } else {
+                        // Gagal login
+                        Alpine.store('message').showMessage("Login gagal : User tidak terdaftar ! (Silahkan hubungi admin.)", 'error');
+
+                        setTimeout(() => {
+                            window.location.replace('/')
+                        }, 5000)
+                    }
+                }
+            })
+
+            Alpine.store('isLoading', false);
         },
 
         // page
