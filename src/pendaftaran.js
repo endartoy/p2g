@@ -80,10 +80,6 @@ function ndrtApp() {
                     } else {
                         // Gagal login
                         Alpine.store('message').showMessage("Login gagal : User tidak terdaftar ! (Silahkan hubungi admin.)", 'error');
-
-                        setTimeout(() => {
-                            window.location.replace('/')
-                        }, 5000)
                     }
                 } else {
                     // Gagal login
