@@ -40,7 +40,7 @@ document.addEventListener('alpine:init', () => {
     Alpine.store('isLoading', true);
 
     // storedPage
-    if ( !['kas p2g'].includes(localStorage.getItem('stored_page')) ) {
+    if ( !['kas p2g', 'user page'].includes(localStorage.getItem('stored_page')) ) {
         localStorage.setItem('stored_page', 'kas p2g');
         Alpine.store('page', 'kas p2g')
     } else {
@@ -66,8 +66,6 @@ function ndrtApp() {
         doCRUD: false,
 
         init() {
-            if (!navigator.onLine) Alpine.store('message').showMessage("Tidak ada koneksi internet", 'error'); return;
-
             auth.onAuthStateChanged(async user => {
                 if (user) {
                     const docID = user.uid;
@@ -634,14 +632,16 @@ function userPage() {
         hapusUser(i) {
             if (confirm("Hapus data "+ i.displayName +" ?")){
                 Alpine.store('isLoading', true);
-                db.collection('users').doc(i.id).delete().then(() => {
-                    db.collection('roles').doc(i.id).delete();
-                    Alpine.store('message').showMessage('Hapus data berhasil');
+
+                db.collection('roles').doc(i.id).delete().then(() => {
+                    db.collection('users').doc(i.id).delete().then(() => {
+                        Alpine.store('message').showMessage('Hapus data berhasil');
+                    })
                 }).catch((error) => {
                     Alpine.store('message').showMessage('Error: ' + error.message, 'error');
                 }).finally(() => {
-                    Alpine.store('isLoading', false);
-                });
+                    Alpine.store('isLoading', false)
+                })
             }
         }
     }

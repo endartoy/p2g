@@ -62,8 +62,6 @@ function ndrtApp() {
         dataList: [],
 
         init() {
-            if (!navigator.onLine) Alpine.store('message').showMessage("Tidak ada koneksi internet", 'error'); return;
-
             auth.onAuthStateChanged(async user => {
                 if (user) {
                     const docID = user.uid;
@@ -87,6 +85,13 @@ function ndrtApp() {
                             window.location.replace('/')
                         }, 5000)
                     }
+                } else {
+                    // Gagal login
+                    Alpine.store('message').showMessage("Login gagal : User tidak terdaftar ! (Silahkan hubungi admin.)", 'error');
+
+                    setTimeout(() => {
+                        window.location.replace('/')
+                    }, 5000)
                 }
             })
 
