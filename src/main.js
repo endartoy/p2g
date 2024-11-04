@@ -321,6 +321,9 @@ function kasP2g() {
                 }));
                 Alpine.store('isLoading', false);
             }, (error) => {
+                console.log('error')
+                console.log(error.code)
+
                 Alpine.store('message').showMessage('Error fetching data: ' + error.message, 'error');
                 Alpine.store('isLoading', false);
             });
@@ -374,195 +377,165 @@ function kasP2g() {
 
         // generatePDF
         printPDF() {
+            const doPrint = confirm("Eksport data ke PDF ?")
             const doCRUD = ['superadmin', 'admin'].includes(Alpine.store('user_info').userRole);
-            if (!doCRUD) return;
+            if (!doCRUD && !doPrint) return;
 
             const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
 
-            // paraf
-            const paraf = [
-                [{text: '', border: [false, false, false, false]}, {text: new Date().toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }), alignment: 'center', border: [false, false, false, false]}],
+            let tableHeader = [
                 [
-                    // {text: 'Bendahara', alignment: 'center', border: [false, false, false, false]},
-                    {text: '', alignment: 'center', border: [false, false, false, false]},
-                    {text: 'Ketua P2G', alignment: 'center', border: [false, false, false, false]}
-                ],
-                [{text: ' ', alignment: 'center', colSpan: 2, border: [false, false, false, false]}, {}],
-                [{text: ' ', alignment: 'center', colSpan: 2, border: [false, false, false, false]}, {}],
-                [{text: ' ', alignment: 'center', colSpan: 2, border: [false, false, false, false]}, {}],
-                [{text: ' ', alignment: 'center', colSpan: 2, border: [false, false, false, false]}, {}],
-                [
-                    // {text: '(                                                       )', alignment: 'center', border: [false, false, false, false]}, 
-                    {text: '', alignment: 'center', border: [false, false, false, false]}, 
-                    {text: '(                                                       )', alignment: 'center', border: [false, false, false, false]}
+                    { content: 'NO', styles: { halign: 'center' } },
+                    { content: 'TANGGAL', styles: { halign: 'center' } },
+                    { content: 'KETERANGAN', styles: { halign: 'center' } },
+                    { content: 'JUMLAH', styles: { halign: 'center' } },
                 ]
             ]
 
-            // Define table Pemasukan
-            const tableHeaderPemasukan = [
-                {text: 'NO', style: 'header'}, 
-                {text: 'TANGGAL', style: 'header'}, 
-                {text: 'KETERANGAN', style: 'header'},
-                {text: 'JUMLAH', style: 'header'}
-            ];
+            let tablePemasukan = []
+            
+            // saldo sebelum
+            let saldoSebelum = this.totalBeforeFilter > 0 ? [
+                { content: 1, styles: { halign: 'center' } },
+                this.viewDate(this.filterTanggal, 's'),
+                'SALDO KAS P2G per ' + this.viewDate(this.filterTanggal, 'l'),
+                { content: this.totalBeforeFilter.toLocaleString('id-ID'), styles: { halign: 'right' } },
+            ] : [];
 
-            var sumPemasukan = [
-                {text: 'JUMLAH TOTAL', bold: true, alignment: 'right', colSpan: 3},
-                {},
-                {},
-                {text: (this.totalBeforeFilter + this.totalDebit).toLocaleString('id-ID') , bold: true, alignment: 'right'},
-            ];
+            // Create table data for table Pemasukan
+            tablePemasukan = this.filteredDebitKasList.map((res, index) => [
+                { content: index + (this.totalBeforeFilter > 0 ? 2 : 1), styles: { halign: 'center' } },
+                { content: new Date(res['tanggal']).toLocaleDateString('id-ID', options) },
+                res['ket'],
+                { content: res['jumlah'].toLocaleString('id-ID'), styles: { halign: 'right' } },
+            ]);
 
-            if (this.filteredDebitKasList.length > 0) {
-                var tableKasBeforeFilter = this.totalBeforeFilter > 0 ? [
-                    { text: 1, alignment: 'center' },
-                    this.viewDate(this.filterTanggal, 's'),
-                    'SALDO KAS P2G per ' + this.viewDate(this.filterTanggal, 'l'),
-                    { text: this.viewRupiah(this.totalBeforeFilter), alignment: 'right' }
-                ] : [];
+            // push saldo sebelum
+            if ( this.totalBeforeFilter > 0 ) { tablePemasukan.unshift(saldoSebelum) }
 
-                // Create table data for table Pemasukan
-                var tablePemasukan = this.filteredDebitKasList.map((res, index) => [
-                    { text: index + (this.totalBeforeFilter > 0 ? 2 : 1), alignment: 'center' },
-                    new Date(res['tanggal']).toLocaleDateString('id-ID', options),
-                    res['ket'],
-                    { text: res['jumlah'].toLocaleString('id-ID'), alignment: 'right' }
-                ]);
-
-                tablePemasukan.push(sumPemasukan);
-                if (this.totalBeforeFilter > 0) { tablePemasukan.unshift(tableKasBeforeFilter); }
-
-            } else {
-                var tablePemasukan = [[{text:"TIDAK ADA DATA", alignment: "center", colSpan: 4}, {}, {}, {}]];
+            // jika pemasukan null
+            if (tablePemasukan.length <= 0) {
+                tablePemasukan = [
+                    [{ content: 'TIDAK ADA PEMASUKAN', colSpan:4, styles: { halign: 'center' } }]
+                ];
             }
-            tablePemasukan.unshift(tableHeaderPemasukan);
 
-            // Define table Pengeluaran
-            var tableHeaderPengeluaran = [
-                {text: 'NO', style: 'header'}, 
-                {text: 'TANGGAL', style: 'header'}, 
-                {text: 'KETERANGAN', style: 'header'},
-                {text: 'JUMLAH', style: 'header'}
-            ];
-
-            var sumPengeluaran = [
-                {text: 'JUMLAH TOTAL', bold: true, alignment: 'right', colSpan: 3},
-                {},
-                {},
-                {text: this.totalKredit.toLocaleString('id-ID') , bold: true, alignment: 'right'},
-            ];
-
+            let tablePengeluaran = []
             if (this.filteredKreditKasList.length > 0) {
-                // Create table data for table Pemasukan
-                var tablePengeluaran = this.filteredKreditKasList.map((res, index) => [
-                    { text: index + 1, alignment: 'center' },
-                    new Date(res['tanggal']).toLocaleDateString('id-ID', options),
+                // Table Pengeluaran
+                tablePengeluaran = this.filteredKreditKasList.map((res, index) => [
+                    { content: index + 1, styles: { halign: 'center' } },
+                    { content: new Date(res['tanggal']).toLocaleDateString('id-ID', options) },
                     res['ket'],
-                    { text: res['jumlah'].toLocaleString('id-ID'), alignment: 'right' }
+                    { content: res['jumlah'].toLocaleString('id-ID'), styles: { halign: 'right' } },
                 ]);
-                
-                tablePengeluaran.push(sumPengeluaran);
             } else {
-                var tablePengeluaran = [[{text:"TIDAK ADA DATA", alignment: "center", colSpan: 4}, {}, {}, {}]];
+                tablePengeluaran = [
+                    [{ content: 'TIDAK ADA PENGELUARAN', colSpan:4, styles: { halign: 'center' } }]
+                ];
             }
-            tablePengeluaran.unshift(tableHeaderPengeluaran);
 
-            // Create document definition
-            var docDefinition = {
-                content: [
-                    { text: 'LAPORAN KAS PEMUDA-PEMUDI GADEN \r\n TAHUN '+ new Date().toLocaleDateString("id-ID", { year: 'numeric' }) , style: 'title' },
-                    { text: '1. Pemasukan',  style: 'sub' },
-                    // Table Pemasukan
-                    {
-                        style: 'table',
-                        table: {
-                            headerRows: 1,
-                            widths: [25,80, '*', 80], // '*' means auto
-                            body: tablePemasukan
-                        }
-                    },
-                    { text: '2. Pengeluaran',  style: 'sub', pageBreak: 'before' },
-                    // Table Pengeluaran
-                    {
-                        style: 'table',
-                        table: {
-                            headerRows: 1,
-                            widths: [25,80, '*', 80], // '*' means auto
-                            body: tablePengeluaran,
-                        },
-                    },
-                    //  Saldo Akhir
-                    {
-                        text: 'SALDO AKHIR      :       ' + ((this.totalBeforeFilter + this.totalDebit) - this.totalKredit).toLocaleString('id-ID'),
-                        bold: true,
-                        fontSize: 18,
-                        alignment: 'right',
-                        margin: [0, 20, 0, 50]
-                    },
-                    {
-                        style: 'table',
-                        table: {
-                            headerRows: 0,
-                            widths: ['*', '*'], // '*' means auto
-                            body: paraf,
-                        },
-                    },
-                    
+
+
+            const paraf = [
+                [
+                    { content: '', styles: { halign: 'center' } },
+                    { content: new Date().toLocaleDateString("id-ID", { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }), styles: { halign: 'center' } },
                 ],
+                [
+                    { content: 'Bendahara', styles: { halign: 'center' } },
+                    { content: 'Ketua', styles: { halign: 'center' } },
+                ],
+                [
+                    { content: '\r\n\r\n\r\n\r\n\r\n(                                                       )', styles: { halign: 'center' } },
+                    { content: '\r\n\r\n\r\n\r\n\r\n(                                                       )', styles: { halign: 'center' } },
+                ]
+            ]
+
+            // Access jsPDF from the UMD bundle
+            const { jsPDF } = window.jspdf;
+            // Create a new jsPDF document
+            const doc = new jsPDF();
+
+            // 1. Add a Page Title
+            doc.setFontSize(16); // Set title font size
+            doc.text('LAPORAN KAS PEMUDA-PEMUDI GADEN \r\n TAHUN '+ new Date().toLocaleDateString("id-ID", { year: 'numeric' }), doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+
+            // pemasukan
+            doc.setFontSize(12);
+            doc.text('1. Pemasukan', 14, 40)
+
+            // table pemasukan
+            doc.autoTable({
+                startY: 45,
+                theme: 'grid',
+                head: tableHeader,
+                body: tablePemasukan,
+                tableWidth: 'auto',
+                rowPageBreak: 'avoid',
                 styles: {
-                    title: {
-                        fontSize: 18,
-                        bold: true,
-                        alignment: 'center',
-                        margin: [0, 0, 0, 30] // [left, top, right, bottom]
-                    },
-                    sub: {
-                        fontSize: 14,
-                        bold: true,
-                        margin: [0, 0, 0, 5] // [left, top, right, bottom]
-                    },
-                    header: {
-                        bold: true,
-                        alignment: 'center',
-                    },
-                    table: {
-                        margin: [0, 0, 0, 10], // [left, top, right, bottom]
-                    }
+                    fontSize: 12,
+                }
+            })
+
+            // pengeluaran
+            doc.setFontSize(12);
+            doc.text('2. Pengeluaran', 14, doc.lastAutoTable.finalY + 20)
+
+            // table pemasukan
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 25,
+                theme: 'grid',
+                head: tableHeader,
+                body: tablePengeluaran,
+                tableWidth: 'auto',
+                rowPageBreak: 'avoid',
+                styles: {
+                    fontSize: 12,
+                }
+            })
+
+            // total saldo
+            doc.setFontSize(16)
+            doc.setFont('helvetica', 'bold')
+            doc.text('SALDO AKHIR      :       ' + ((this.totalBeforeFilter + this.totalDebit) - this.totalKredit).toLocaleString('id-ID'),
+                doc.internal.pageSize.getWidth() - 14, doc.lastAutoTable.finalY + 15, { align: 'right' }
+            )
+
+            // Paraf
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 30,
+                theme: 'plain', // 'striped', 'grid' or 'plain'
+                body: paraf,
+                tableWidth: 'auto', // Ensure the table fits within the page
+                pageBreak: 'avoid',
+                styles: {
+                    fontSize: 12,
+                    lineWidth: 0, // Set border width to 0 to hide borders
+                    fillColor: null,   // Remove background color
                 },
-                footer: function(currentPage, pageCount) {
-                        return {
-                            columns: [
-                                {
-                                    text: ['Dibuat tanggal '+new Date().toLocaleDateString('id-ID', options)],
-                                    fontSize: 10,
-                                    alignment: 'left',
-                                    margin: [40, 0],
-                                    width: '*'
-                                },
-                                {
-                                    text: `Page ${currentPage} of ${pageCount}`,
-                                    fontSize: 10,
-                                    alignment: 'right',
-                                    margin: [0, 0, 40, 0],
-                                    width: 'auto'
-                                }
-                            ]
-                        };
-                    }
-            };
+                // margin: { top: 15, left: 25, right: 25 }, // Add margins
+            });
 
-            // Create PDF document
-            var pdfDoc = pdfMake.createPdf(docDefinition);
+            // 4. Add a footer with page number (optional)
+            let pageCount = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= pageCount; i++) {
+                doc.setPage(i);
+                doc.setFontSize(10)
+                doc.setFont('helvetica', 'normal')
+                doc.setFont('helvetica', 'italic')
 
-            // Open NewTab PDF
-            // pdfDoc.open()
+                doc.text('Page ' + i + ' of ' + pageCount, doc.internal.pageSize.getWidth() - 14, doc.internal.pageSize.getHeight() - 10, 
+                    { align: 'right' }
+                );
 
-            // Download PDF
-            pdfDoc.download('Laporan Kas P2G ('+ new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) +').pdf')
+                doc.text('Dibuat tanggal ' + new Date().toLocaleDateString('id-ID', options), 14, doc.internal.pageSize.getHeight() - 10, 
+                    { align: 'left' }
+                );
+            }
 
-        },
-
-        printPDFx() {
+            // Save the PDF
+            doc.save('Laporan KAS P2G ('+ new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) +').pdf');
             
         }
 

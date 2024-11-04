@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ndrt_PRJCT</title>
+    <title>.rndm</title>
     <link rel="icon" href="public/img/logo_p2g.png" type="image/png">
 
     <!-- fire base -->
@@ -11,9 +11,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
-    <!-- pdfMake -->
-    <script src="public/js/pdfmake/pdfmake.min.js"></script>
-    <script src="public/js/pdfmake/vfs_fonts.js"></script>
+    <!-- Include the correct UMD version of jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Include the UMD version of the autoTable plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 
     <!-- alpine js &  -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
@@ -68,7 +69,7 @@
                 <nav class="navbar has-background-success-light" role="navigation" aria-label="main navigation" style="z-index: 39;"
                 x-data="{ isActive: false }" >
                     <div class="navbar-brand is-flex is-align-items-center">
-                        <a class="navbar-item" href="#">
+                        <a class="navbar-item" @click="switchPage('kas p2g')" >
                             <img src="public/img/logo_p2g.png" alt="Logo">
                         </a>
 

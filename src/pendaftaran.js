@@ -64,18 +64,10 @@ function ndrtApp() {
         init() {
             auth.onAuthStateChanged(async user => {
                 if (user) {
-                    const docID = user.uid;
-                    
-                    const rolesRef = firebase.firestore().collection('roles').doc(docID);
+                    const rolesRef = firebase.firestore().collection('roles').doc(user.uid);
                     const rolesDoc = await rolesRef.get();
 
                     if (rolesDoc.data().role === 'tps') {
-                        Alpine.store('user_info').user = user;
-                        localStorage.setItem('stored_user', user);
-
-                        Alpine.store('user_info').userRole = rolesDoc.data().role;
-                        localStorage.setItem('stored_userRole', rolesDoc.data().role);
-
                         this.switchPage(Alpine.store('page'));
                     } else {
                         // Gagal login
@@ -83,7 +75,7 @@ function ndrtApp() {
                     }
                 } else {
                     // Gagal login
-                    Alpine.store('message').showMessage("Login gagal : User tidak terdaftar ! (Silahkan hubungi admin.)", 'error');
+                    Alpine.store('message').showMessage("Login gagal", 'error');
                 }
             })
 
@@ -394,9 +386,9 @@ function _daftarHadir() {
                 { content: 'ALAMAT',styles: { halign: 'center', cellWidth: 55} }, 
             ]]
 
-            if (this.dataList.length > 0) {
+            if (this.daftarHadir.length > 0) {
                 // Create table data for table Pemasukan
-                tableDataList = this.dataList.map((res, index) => [
+                tableDataList = this.daftarHadir.map((res, index) => [
                     { content: index + 1, styles: { halign: 'center'} },
                     { content: res.tipe + ' ' + res.no_urut },
                     res.nama,
@@ -406,19 +398,6 @@ function _daftarHadir() {
             } else {
                 tableDataList = [[{ content: 'TIDAK ADA DATA', colSpan: 5, styles: { halign: 'center' } }]];
             }
-
-            // dummy
-            // for (let i = 0; i < 230; i++) {
-            //     tableDataList.push(
-            //         [
-            //             { content: i+ 1, styles: { halign: 'center'} },
-            //             { content: 'DPT '+i },
-            //             'NUR EKO WOBOSOW SASIMSKHS SASAS',
-            //             {content: 'L', styles: { halign: 'center'}},
-            //             'KARANGJOHO RT 03 RW 06'
-            //         ]
-            //     )
-            // }
 
             // Access jsPDF from the UMD bundle
             const { jsPDF } = window.jspdf;
@@ -443,9 +422,17 @@ function _daftarHadir() {
             // table info
             doc.autoTable({
                 html: "#tableInfo",
-                useCss: true,        // Preserve any inline CSS styles
+                // useCss: true,        // Preserve any inline CSS styles
+                theme: 'grid',
                 tableWidth: 'wrap',
-                pageBreak: 'avoid'
+                pageBreak: 'avoid',
+                didParseCell: function(data) {
+                    const cell = data.cell.styles
+                    if (data.column.index > 0) {
+                        cell.halign = 'right'
+                        cell.cellWidth = 20
+                    }
+                }
             })
 
             // 4. Add a footer with page number (optional)
