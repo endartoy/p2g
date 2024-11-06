@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>.rndm</title>
+    <title>.pendaftaran</title>
     <link rel="icon" href="public/img/logo_p2g.png" type="image/png">
 
     <!-- fire base -->
@@ -58,6 +58,21 @@
             height: 100%;
             max-height: 100% !important;
         } */
+
+        /* sugestion box */
+        .dropdown-menu.is-sugestion-box {
+            border: 1px solid #dbdbdb;
+            max-height: 200px;
+            overflow-y: auto;
+            width: 100%;
+
+            /* hide */
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .dropdown-menu.is-sugestion-box.show {
+            opacity: 1 !important;
+        }
     </style>
 </head>
 
@@ -376,6 +391,17 @@
                             <div class="control">
                                 <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
                                 x-model="filterNama" >
+
+                                <div>
+                                    <label class="checkbox is-align-content-center">
+                                        <input type="checkbox" x-model="f_l" @click="f_l = !f_l; f_p = false" />
+                                        Laki - laki
+                                    </label>
+                                    <label class="checkbox is-align-content-center ml-2">
+                                        <input type="checkbox" x-model="f_p" @click="f_p = !f_p; f_l = false" />
+                                        Perempuan
+                                    </label>
+                                </div>
                             </div>
                             <!-- <div class="control">
                                 <button class="button is-success is-info" @click="cariData()" >
@@ -412,9 +438,9 @@
             <main class="p-2 full-height-container">
                 <div class="columns is-multiline is-mobile">
                     <div class="column is-full">
-                        <p x-show="filterNama !== ''" class="has-text-black has-text-centered is-uppercase is-size-5 mb-5 has-text-weight-semibold" > Hasil pencarian </p>
+                        <p x-show="filterNama !== '' || filterJK" class="has-text-black has-text-centered is-uppercase is-size-5 mb-5 has-text-weight-semibold" > Hasil pencarian </p>
 
-                        <template x-if="daftarHadir.length > 0 && filterNama === ''">
+                        <template x-if="daftarHadir.length > 0 && filterNama === '' && filterJK === false ">
                             <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo" >
                                 <thead>
                                     <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
@@ -887,122 +913,113 @@
                         <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
                         <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
                     </header>
-                    <section class="modal-card-body foot has-background-primary-light p-2">
-                        <!-- form -->
-                        <form @submit.prevent="saveItem()" class="columns is-mobile is-multiline m-0" >
-                            <div class="column is-full">
-                                <div class="field ">
-                                    <div class="control is-expanded">
-                                        <div class="select is-fullwidth" >
-                                            <select x-model="item.tipe" :change="count_no_urut()" :disabled="item.id !== '' " required>
-                                                <option value="DPT">DPT</option>
-                                                <option value="DPTB">DPTB</option>
-                                                <option value="DPK">DPK</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div class="field">
-                                    <div class="control is-expanded">
-                                        <input class="input is-uppercase" type="number" placeholder="Nomor Urut" required disabled
-                                        x-model="item.no_urut" >
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <div class="control is-expanded">
-                                        <input class="input is-uppercase" type="text" placeholder="Nama" required
-                                        x-model="item.nama" >
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <div class="control is-expanded">
-                                        <input class="input is-uppercase" type="text" placeholder="NIK" 
-                                        x-model="item.nik" >
-                                    </div>
-                                </div>
-
-                                <div class="field ">
-                                    <div class="control is-expanded">
-                                        <div class="select is-fullwidth" >
-                                            <select x-model="item.jk" required>
-                                                <option value="L">Laki - Laki</option>
-                                                <option value="P">Perempuan</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <div class="control is-expanded">
-                                        <!-- <input class="input is-uppercase" type="text" placeholder="Alamat" required
-                                        x-model="item.alamat" > -->
-
-                                        <textarea class="textarea is-uppercase" placeholder="Alamat" rows="2" required
-                                        x-model="item.alamat" > </textarea>
-                                    </div>
-                                </div>
-
-                                <div class="field">
-                                    <div class="control is-expanded">
-                                        <input class="input is-uppercase" type="number" placeholder="Umur"
-                                        x-model="item.umur" >
-                                    </div>
-                                </div>
-
-                                <!-- <div class="field" x-data="{focused: false}" >
-                                    <div class="control">
-                                        <div class="dropdown is-active" style="width: 100%;"  >
-                                            <div class="dropdown-trigger" style="width: 100%;">
-                                                <input class="input is-uppercase" type="text" placeholder="Ketik nama untuk mencari ..." 
-                                                    x-model="query.nama" 
-                                                    @input="filterSuggestions()" 
-                                                    @focus="focused = true" 
-                                                    @blur="focused = false" >
+                    <!-- form -->
+                    <form @submit.prevent="saveItem()">
+                        <div class="modal-card-body has-background-primary-light p-2">
+                            <div class="columns is-mobile is-multiline m-0" >
+                                <div class="column is-full">
+                                    <div class="field ">
+                                        <div class="control is-expanded">
+                                            <div class="select is-fullwidth" >
+                                                <select x-model="item.tipe" :change="count_no_urut()" :disabled="item.id !== '' " required>
+                                                    <option value="DPT">DPT</option>
+                                                    <option value="DPTB">DPTB</option>
+                                                    <option value="DPK">DPK</option>
+                                                </select>
                                             </div>
+                                        </div>
+                                    </div>
 
-                                            <div class="dropdown-menu is-sugestion-box "
-                                            :class="{'show': focused && filteredSuggestions.length > 0}" >
-                                                <div class="dropdown-content">
-                                                    <template x-for="suggestion in filteredSuggestions" >
-                                                        <a class="dropdown-item" @click="selectSuggestion(suggestion);"> 
-                                                            <span class="is-size-6">
-                                                                <span class="is-uppercase" x-text="suggestion.tipe"></span> 
-                                                                <span class="is-uppercase" x-text="suggestion.no"></span> 
-                                                                [ <span class="is-uppercase" x-text="suggestion.nama"></span> ] 
-                                                                <span x-show="suggestion.nik">[ <span class="is-uppercase" x-text="suggestion.nik"></span> ]</span> 
-                                                            </span>
-                                                        </a>
-                                                    </template>
+                                    <div class="field">
+                                        <div class="control is-expanded">
+                                            <input class="input is-uppercase" type="number" placeholder="Nomor Urut" required
+                                            x-model="item.no_urut" >
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <div class="control is-expanded">
+                                            <input class="input is-uppercase" type="text" placeholder="Nama" required
+                                            x-model="item.nama" >
+                                        </div>
+                                    </div>
+
+                                    <div class="field">
+                                        <div class="control is-expanded">
+                                            <input class="input is-uppercase" type="text" placeholder="NIK" 
+                                            x-model="item.nik" >
+                                        </div>
+                                    </div>
+
+                                    <div class="field ">
+                                        <div class="control is-expanded">
+                                            <div class="select is-fullwidth" >
+                                                <select x-model="item.jk" required>
+                                                    <option value="L">Laki - Laki</option>
+                                                    <option value="P">Perempuan</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- <div class="field">
+                                        <div class="control is-expanded">
+                                            <textarea class="textarea is-uppercase" placeholder="Alamat" rows="2" required
+                                            x-model="item.alamat" > </textarea>
+                                        </div>
+                                    </div> -->
+
+                                    <div class="field" x-data="{ focused: false }" >
+                                        <div class="control">
+                                            <div class="dropdown is-active" style="width: 100%;"  >
+                                                <div class="dropdown-trigger" style="width: 100%;">
+                                                    <input class="input is-uppercase" type="text" placeholder="ALAMAT" 
+                                                        x-model="item.alamat" 
+                                                        @input="filterAlamat()" 
+                                                        @focus="focused = true" 
+                                                        @blur="focused = false" >
+                                                </div>
+
+                                                <div class="dropdown-menu is-sugestion-box "
+                                                :class="{'show': focused && dropdownItems.length > 0}" >
+                                                    <div class="dropdown-content">
+                                                        <template x-for="alamat in dropdownItems " :key="alamat" >
+                                                            <a class="dropdown-item"
+                                                            @click="item.alamat = alamat; focused = false; dropdownItems = []"> 
+                                                                <span class="is-size-6 is-uppercase" x-text="alamat"> </span> 
+                                                            </a>
+                                                        </template>
+                                                    </div>
                                                 </div>
                                             </div>
-
                                         </div>
                                     </div>
-                                </div> -->
-                                
-                            </div>
 
-                            <div class="column is-full">
-                                <div class="control is-flex is-justify-content-space-between">
-                                    <div>
-                                        <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
-                                            <span class="icon is-small">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </span>
-                                        </a>
-                                    </div>
-                                    <div class="is-flex is-justify-content-end">
-                                        <button type="submit" class="button is-primary mx-1 has-text-black" ><strong x-text="item.id ? 'UPDATE' : 'SIMPAN'" >SIMPAN</strong></button>
-                                    </div>
+                                    <div class="field">
+                                        <div class="control is-expanded">
+                                            <input class="input is-uppercase" type="number" placeholder="Umur"
+                                            x-model="item.umur" >
+                                        </div>
+                                    </div>                                
                                 </div>
                             </div>
-                        </form>
-                    </section>
-                    <!-- <footer class="modal-card-foot has-background-primary">            
-                    </footer> -->
+                        </div>
+                        <footer class="modal-card-foot has-background-primary-light column py-2">      
+                            <div class="control is-flex is-justify-content-space-between">
+                                <div>
+                                    <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
+                                        <span class="icon is-small">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </span>
+                                    </a>
+                                </div>
+                                <div class="is-flex is-justify-content-end">
+                                    <button type="submit" class="button is-primary mx-1 has-text-black" ><strong x-text="item.id ? 'UPDATE' : 'SIMPAN'" >SIMPAN</strong></button>
+                                </div>
+                            </div>
+                        </footer>
+                    </form>
                 </div>
             </div>
 

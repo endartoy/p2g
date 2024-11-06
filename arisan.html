@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>.arisan</title>
+    <link rel="icon" href="public/img/logo_p2g.png" type="image/png">
+
+    <!-- fire base -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <!-- Include the correct UMD version of jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Include the UMD version of the autoTable plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <!-- alpine js &  -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
+    
+    <!-- bulma css & font awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <!-- custom css -->
+    <style>
+        html, body {
+            height: 100%;
+        }
+        .full-height-container {
+            min-height: 100vh; /* 100vh ensures the container takes at least the full height of the viewport */
+        }
+        .navbar-item.is-active {
+            background-color: hsl(171, 100%, 41%, 0.2) !important;
+        }
+
+        .is-sticky-top {
+            position: sticky;
+            top: 0;
+            z-index: 39;
+        }
+
+        /* Alert & Loading */
+        .is-sticky-bottom {
+            position: sticky;
+            bottom: 0;
+            z-index: 41;
+        }
+
+        .modal-card-body.foot {
+            border-bottom-left-radius: 6px !important;
+            border-bottom-right-radius: 6px !important;
+        }
+        /* .modal-card {
+            width: 100%;
+            height: 100%;
+            max-height: 100% !important;
+        } */
+    </style>
+</head>
+
+<body class="container" x-data="ndrtApp()" >
+    <!-- navbar -->
+    <div class="p-2 is-sticky-top has-background-white" >
+        <div class="columns is-mobile is-multiline is-centered">
+            <div class="column is-full">
+                
+                <nav class="navbar has-background-success-light" role="navigation" aria-label="main navigation" style="z-index: 39;"
+                x-data="{ isActive: false }" >
+                    <div class="navbar-brand is-flex is-align-items-center">
+                        <a class="navbar-item" @click="switchPage('kas p2g')" >
+                            <img src="public/img/logo_p2g.png" alt="Logo">
+                        </a>
+
+                        <span class="is-hidden-desktop">
+                            <p class="is-italic has-text-weight-semibold is-uppercase" x-text="$store.page"> P2G </p>
+                        </span>
+
+                        <a role="button" class="navbar-burger" :class="{ 'is-active': isActive }" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" @click="isActive = !isActive" @click.outside="isActive = false" >
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                            <span aria-hidden="true"></span>
+                        </a>
+                    </div>
+
+                    <div class="navbar-menu" :class="{ 'is-active': isActive }" x-transition >
+                        <div class="navbar-start">
+                            <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'kas p2g'}" @click="switchPage('kas p2g')" > KAS P2G </a>
+                            <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'arisan'}" @click="switchPage('arisan')" > ARISAN </a> -->
+                            <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'tes app'}" @click="switchPage('tes app')" > TES APP </a> -->
+                        </div>
+
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+
+                                <template x-if="$store.user_info.user">
+                                    <div class="field has-addons is-justify-content-end m-0">
+                                        <p class="control">
+                                            <button class="button is-rounded px-2">
+                                                <figure class="image">
+                                                    <img class="is-rounded" :src="$store.user_info.user.photoURL" />
+                                                </figure>
+                                                <span class="has-text-weight-semibold is-family-sans-serif is-uppercase ml-2" x-text="$store.user_info.user.displayName" ></span>
+                                            </button>
+                                        </p>
+                                        <template x-if="$store.user_info.userRole === 'superadmin' ">
+                                            <p class="control">
+                                                <a class="button is-info" @click="switchPage('user page') " ><span class="icon is-small"><i class="fas fa-users"></i></span></a>
+                                            </p>
+                                        </template>
+                                        <p class="control">
+                                            <a class="button is-warning" @click="logout()" ><span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span></a>
+                                        </p>
+                                    </div>
+                                </template>      
+                                
+                                <template x-if="!$store.user_info.user">
+                                    <div class="field has-addons is-justify-content-end m-0">
+                                        <p class="control">
+                                            <a class="button is-info" @click="loginWithGoogle()" ><span class="has-text-weight-semibold" >Login</span></a>
+                                        </p>
+                                    </div>
+                                </template> 
+
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="src/arisan.js"></script>
+</body>
+
+</html>
