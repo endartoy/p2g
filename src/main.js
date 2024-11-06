@@ -321,9 +321,6 @@ function kasP2g() {
                 }));
                 Alpine.store('isLoading', false);
             }, (error) => {
-                console.log('error')
-                console.log(error.code)
-
                 Alpine.store('message').showMessage('Error fetching data: ' + error.message, 'error');
                 Alpine.store('isLoading', false);
             });
@@ -377,9 +374,11 @@ function kasP2g() {
 
         // generatePDF
         printPDF() {
-            const doPrint = confirm("Eksport data ke PDF ?")
             const doCRUD = ['superadmin', 'admin'].includes(Alpine.store('user_info').userRole);
-            if (!doCRUD && !doPrint) return;
+            if (!doCRUD) return;
+
+            const doPrint = confirm("Eksport data ke PDF ?")
+            if (!doPrint) return;
 
             const options = { day: '2-digit', month: '2-digit', year: '2-digit' };
 

@@ -132,57 +132,63 @@ function ndrtApp() {
         // --------------------------------- Database ------------------------------------- //
         // get DPT
         get dataDPT(){
-            if (this.filterNama !== '') {
-                return this.dataList.filter(i => i.tipe === 'DPT' && i.nama.includes(this.filterNama.toUpperCase()) );
-            } else {
-                return this.dataList.filter(i => i.tipe === 'DPT');
-            }
+            return this.dataList.filter(i => i.tipe === 'DPT' && 
+                (this.filterNama ? i.nama.includes(this.filterNama.toUpperCase()) : true)
+            );
         },
 
         // get DPTB
         get dataDPTB(){
-            if (this.filterNama !== '') {
-                return this.dataList.filter(i => i.tipe === 'DPTB' && i.nama.includes(this.filterNama.toUpperCase()) );
-            } else {
-                return this.dataList.filter(i => i.tipe === 'DPTB');
-            }
+            return this.dataList.filter(i => i.tipe === 'DPTB' && 
+                (this.filterNama ? i.nama.includes(this.filterNama.toUpperCase()) : true)
+            );
         },
 
         // get DPK
         get dataDPK(){
-            if (this.filterNama !== '') {
-                return this.dataList.filter(i => i.tipe === 'DPK' && i.nama.includes(this.filterNama.toUpperCase()) );
-            } else {
-                return this.dataList.filter(i => i.tipe === 'DPK');
-            }
+            return this.dataList.filter(i => i.tipe === 'DPK' && 
+                (this.filterNama ? i.nama.includes(this.filterNama.toUpperCase()) : true)
+            );
         },
 
         // ================================ Daftar Hadir ===================================
+
+        // filter jenik kelamin
+        f_l: false,
+        f_p: false,
+
+        get filterJK() {
+            if (this.f_l) {
+                return 'L'
+            }
+            if (this.f_p) {
+                return 'P'
+            }
+            return false
+        },
+
         // get DPT
         get daftarHadirDPT(){
-            if (this.filterNama !== '') {
-                return this.daftarHadir.filter(i => i.tipe === 'DPT' && i.nama.includes(this.filterNama.toUpperCase()) );
-            } else {
-                return this.daftarHadir.filter(i => i.tipe === 'DPT');
-            }
+            return this.daftarHadir.filter(i => i.tipe === 'DPT' && 
+                (this.filterNama ? i.nama.includes(this.filterNama.toUpperCase()) : true) &&
+                (this.filterJK ? i.jk === this.filterJK : true)
+            );
         },
 
         // get DPTB
         get daftarHadirDPTB(){
-            if (this.filterNama !== '') {
-                return this.daftarHadir.filter(i => i.tipe === 'DPTB' && i.nama.includes(this.filterNama.toUpperCase()) );
-            } else {
-                return this.daftarHadir.filter(i => i.tipe === 'DPTB');
-            }
+            return this.daftarHadir.filter(i => i.tipe === 'DPTB' && 
+                (this.filterNama ? i.nama.includes(this.filterNama.toUpperCase()) : true) &&
+                (this.filterJK ? i.jk === this.filterJK : true)
+            );
         },
 
         // get DTK
         get daftarHadirDPK(){
-            if (this.filterNama !== '') {
-                return this.daftarHadir.filter(i => i.tipe === 'DPK' && i.nama.includes(this.filterNama.toUpperCase()) );
-            } else {
-                return this.daftarHadir.filter(i => i.tipe === 'DPK');
-            }
+            return this.daftarHadir.filter(i => i.tipe === 'DPK' && 
+                (this.filterNama ? i.nama.includes(this.filterNama.toUpperCase()) : true) &&
+                (this.filterJK ? i.jk === this.filterJK : true)
+            );
         },
         
     }
@@ -472,6 +478,14 @@ function dataPemilih() {
         _panggil: null
     }
 
+    const initialAlamat = [
+        'GADEN RT 01',
+        'GADEN RT 02',
+        'GADEN RT 03',
+        'KARANGJOHO',
+        'PATOMAN'
+    ]
+
     return {
         // prop
         form: false,
@@ -576,7 +590,22 @@ function dataPemilih() {
                     Alpine.store('isLoading', false);
                 });
             }
-        }
+        },
 
+
+        // alamat dropdown
+        alamat: initialAlamat,
+        dropdownItems: [],
+        filterAlamat() {
+            if (this.item.alamat) {
+                const query = this.item.alamat.toUpperCase();
+                this.dropdownItems = this.alamat.filter(item => 
+                    item.toUpperCase().includes(query)
+                );
+            } else {
+                this.dropdownItems = initialAlamat;
+            }
+        },
+        
     }
 }
