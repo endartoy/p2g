@@ -47,6 +47,20 @@ document.addEventListener('alpine:init', () => {
         Alpine.store('page', localStorage.getItem('stored_page'))
     }
 
+    // User Info
+    Alpine.store('user_info', {
+        user: !localStorage.getItem('stored_user') ? localStorage.getItem('stored_user') : null,
+        userRole: localStorage.getItem('stored_userRole') || '',
+
+        reset() {
+            localStorage.setItem('stored_user', null);
+            localStorage.setItem('stored_userRole', '');
+
+            this.user = null;
+            this.userRole = '';
+        }
+    })
+
     // Initialize the ndrtApp globally
     window.appInstance = ndrtApp();
     appInstance.init();  // Call the init method
@@ -63,30 +77,61 @@ function ndrtApp() {
 
         init() {
             auth.onAuthStateChanged(async user => {
-                if (user) {
-                    const rolesRef = firebase.firestore().collection('roles').doc(user.uid);
-                    const rolesDoc = await rolesRef.get();
-
-                    if (rolesDoc.data().role === 'tps') {
-                        this.switchPage(Alpine.store('page'));
-                    } else {
-                        // Gagal login
-                        Alpine.store('message').showMessage("Login gagal : User tidak terdaftar ! (Silahkan hubungi admin.)", 'error');
-                    }
-                } else {
+                if (!user) {
                     // Gagal login
                     Alpine.store('message').showMessage("Login gagal", 'error');
+                    return
                 }
+
+                const rolesRef = firebase.firestore().collection('roles').doc(user.uid);
+                const rolesDoc = await rolesRef.get();
+
+                if (rolesDoc.data().role === 'tps') {
+                    Alpine.store('user_info').user = user
+                    localStorage.setItem('stored_user', user)
+
+                    Alpine.store('user_info').userRole = rolesDoc.data().role
+                    localStorage.setItem('stored_userRole', rolesDoc.data().role)
+
+                    this.switchPage(Alpine.store('page'));
+                } else {
+                    // Gagal login
+                    Alpine.store('message').showMessage("Login gagal : User tidak terdaftar ! (Silahkan hubungi admin.)", 'error');
+                    this.logout()
+                }
+
             })
 
             Alpine.store('isLoading', false);
         },
 
+        // LOGIN
+        loginWithGoogle() {
+            auth.signInWithPopup(provider).then(() => {
+                Alpine.store('message').showMessage('Login berhasil.');
+            }).catch((error) => {
+                Alpine.store('message').showMessage('Login failed: ' + error.message, 'error');
+            });
+        },
+
+        logout() {
+            auth.signOut().then(() => {
+                Alpine.store('message').showMessage('Logged out successfully');
+                Alpine.store('user_info').reset();
+            }).catch((error) => {
+                Alpine.store('message').showMessage('Logout failed: ' + error.message, 'error');
+            });
+        },
+
         // page
         switchPage(x_page) {
+            if (!Alpine.store('user_info').user) {
+                alert('USER TIDAK TERDAFTAR !')
+                return
+            }
+
             Alpine.store('page', x_page);
             localStorage.setItem('stored_page', x_page);
-
             this.readData()
         },
 
@@ -94,19 +139,37 @@ function ndrtApp() {
         // read
         readData() {
             Alpine.store('isLoading', true);
+            
+            const page = Alpine.store('page');
+            const q = {
+                'pendaftaran': '_daftar',
+                'daftar hadir': '_panggil'
+            }[page] || 'no_urut';
 
             db.collection('data_pemilih')
-            .orderBy('no_urut', 'asc').onSnapshot((snapshot) => {
+            .orderBy(q, 'asc').onSnapshot((snapshot) => {
                 const docs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const page = Alpine.store('page');
                 
-                if (page === 'pendaftaran') {
-                    this.antrianList = docs.filter(doc => doc._panggil === null && doc._daftar !== null);
-                    this._belumDaftar = docs.filter(doc => doc._panggil === null && doc._daftar === null);
-                } else if (page === 'daftar hadir') {
-                    this.daftarHadir = docs.filter(doc => doc._panggil !== null);
-                } else if (page === 'data pemilih') {
-                    this.dataList = docs;
+                switch (page) {
+                    case 'pendaftaran':
+                        this.antrianList = docs.filter(doc => doc._panggil === null && doc._daftar !== null);
+                        this._belumDaftar = docs.filter(doc => doc._panggil === null && doc._daftar === null);
+                        break;
+                    case 'daftar hadir':
+                        this.daftarHadir = docs
+                            .filter(doc => doc._panggil !== null)
+                            .map(data => {
+                                return {
+                                    ...data,
+                                    _panggil : data._panggil.toDate().toLocaleString('id-ID')
+                                }
+                            });
+                        break;
+                    case 'data pemilih':
+                        this.dataList = docs;
+                        break;
+                    default:
+                        Alpine.store('message').showMessage('Error fetching data', 'error');
                 }
 
                 Alpine.store('isLoading', false);

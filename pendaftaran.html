@@ -63,7 +63,7 @@
         .dropdown-menu.is-sugestion-box {
             border: 1px solid #dbdbdb;
             max-height: 200px;
-            overflow-y: auto;
+            overflow-y: visible;
             width: 100%;
 
             /* hide */
@@ -110,6 +110,36 @@
                             <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'arisan'}" @click="switchPage('arisan')" > ARISAN </a> -->
                             <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'tes app'}" @click="switchPage('tes app')" > TES APP </a> -->
                         </div>
+
+                        <div class="navbar-end">
+                            <div class="navbar-item">
+                                <template x-if="$store.user_info.user">
+                                    <div class="field has-addons is-justify-content-end m-0">
+                                        <p class="control">
+                                            <button class="button is-rounded px-2">
+                                                <figure class="image">
+                                                    <img class="is-rounded" :src="$store.user_info.user.photoURL" />
+                                                </figure>
+                                                <span class="has-text-weight-semibold is-family-sans-serif is-uppercase ml-2" x-text="$store.user_info.user.displayName" ></span>
+                                            </button>
+                                        </p>
+                                        <p class="control">
+                                            <a class="button is-warning" @click="logout()" ><span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span></a>
+                                        </p>
+                                    </div>
+                                </template>      
+                                
+                                <template x-if="!$store.user_info.user">
+                                    <div class="field has-addons is-justify-content-end m-0">
+                                        <p class="control">
+                                            <a class="button is-info" @click="loginWithGoogle()" ><span class="has-text-weight-semibold" >Login</span></a>
+                                        </p>
+                                    </div>
+                                </template> 
+
+                            </div>
+                        </div>
+
                     </div>
                 </nav>
 
@@ -411,8 +441,7 @@
                         </div>
                     </div>
                     <div class="column is-narrow">
-                        <div class="field has-addons is-justify-content-end">
-                            <div class="field ">
+                            <div class="field has-addons">
                                 <div class="control is-expanded">
                                     <div class="select is-fullwidth" >
                                         <select x-model="filterTipe" required>
@@ -423,14 +452,13 @@
                                         </select>
                                     </div>
                                 </div>
-                            </div>
 
-                            <p class="control">
-                                <button class="button is-link" @click="printPDF()" >
-                                    <span class="icon"><i class="fas fa-print"></i></span>
-                                </button>
-                            </p>
-                        </div>
+                                <p class="control">
+                                    <button class="button is-link" @click="printPDF()" >
+                                        <span class="icon"><i class="fas fa-print"></i></span>
+                                    </button>
+                                </p>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -633,47 +661,48 @@
                         <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
                         <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
                     </header>
-                    <section class="modal-card-body foot has-background-primary-light p-2">
+                    <section class="modal-card-body has-background-primary-light p-2">
                         <!-- form -->
                         <div class="columns is-mobile is-multiline m-0" >
                             <div class="column is-full">
                                 <table class="table is-narrow is-bordered is-fullwidth mb-1">
                                     <tbody>
                                         <tr>
-                                            <th rowspan="5" style="vertical-align: middle;">
+                                            <th rowspan="6" style="vertical-align: middle;">
                                                 <span x-text="item.tipe"></span> 
                                                 <span x-text="item.no_urut"></span>
                                             </th>
                                             <td x-text="item.nama"></td>
                                           </tr>
                                         <tr>
-                                            <td x-text="item.nik"></td>
+                                            <td x-text="item.nik ? item.nik : '---'"></td>
                                         </tr>
                                         <tr>
                                             <td x-text="item.alamat"></td>
                                         </tr>
                                         <tr>
-                                            <td><span x-text="item.umur"></span> Th</td>
+                                            <td><span x-text="item.umur ? item.umur : '**'"></span> Th</td>
+                                        </tr>
+                                        <tr>
+                                            <td><span x-text="item._panggil"></span> Th</td>
                                         </tr>
                                     </tbody>
                                 </table>
                             </div>
-
-                            <div class="column is-full">
-                                <div class="control is-flex is-justify-content-space-between">
-                                    <div>
-                                        <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
-                                            <span class="icon is-small">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </span>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </section>
-                    <!-- <footer class="modal-card-foot has-background-primary">            
-                    </footer> -->
+
+                    <footer class="modal-card-foot has-background-primary-light column py-2">
+                        <div class="control is-flex is-justify-content-space-between">
+                            <div>
+                                <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                </a>
+                            </div>
+                        </div>            
+                    </footer>
                 </div>
             </div>
 
@@ -691,26 +720,19 @@
                                 <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
                                 x-model="filterNama" >
                             </div>
-
-                            <!-- <div class="control">
-                                <button class="button is-success is-info" @click="cariData()" >
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div> -->
                         </div>
                     </div>
+
                     <div class="column is-narrow">
-                        <div class="field has-addons is-justify-content-end">
-                            <div class="field ">
-                                <div class="control is-expanded">
-                                    <div class="select is-fullwidth" >
-                                        <select x-model="filterTipe" required>
-                                            <option value="DPT">DPT</option>
-                                            <option value="DPTB">DPTB</option>
-                                            <option value="DPK">DPK</option>
-                                            <option value="SEMUA">SEMUA</option>
-                                        </select>
-                                    </div>
+                        <div class="field has-addons">
+                            <div class="control is-expanded">
+                                <div class="select is-fullwidth" >
+                                    <select x-model="filterTipe" required>
+                                        <option value="DPT">DPT</option>
+                                        <option value="DPTB">DPTB</option>
+                                        <option value="DPK">DPK</option>
+                                        <option value="SEMUA">SEMUA</option>
+                                    </select>
                                 </div>
                             </div>
 
@@ -970,14 +992,14 @@
                                         </div>
                                     </div> -->
 
-                                    <div class="field" x-data="{ focused: false }" >
+                                    <div class="field" x-data="{ focused: false }" @click.outside="focused = false; dropdownItems = []" >
                                         <div class="control">
                                             <div class="dropdown is-active" style="width: 100%;"  >
                                                 <div class="dropdown-trigger" style="width: 100%;">
                                                     <input class="input is-uppercase" type="text" placeholder="ALAMAT" 
                                                         x-model="item.alamat" 
                                                         @input="filterAlamat()" 
-                                                        @focus="focused = true" 
+                                                        @focus="focused = true; filterAlamat();" 
                                                         @blur="focused = false" >
                                                 </div>
 
@@ -1030,11 +1052,11 @@
     <div class="p-2 is-sticky-bottom">
         <div class="columns is-mobile is-multiline is-centered">
             <!-- message -->
-            <div class="column is-full" x-show="$store.message.class" x-transition >
+            <div class="column is-full" x-show="$store.message.class" x-transition>
                 <section class="alert-message is-fullwidth" >
                     <div class="notification" :class="`${$store.message.type}`">
                         <button class="delete" @click="$store.message.class = false"></button>
-                        <strong x-text="$store.message.text" > ---------------- </strong>
+                        <strong x-text="$store.message.text" >  </strong>
                     </div>
                 </section>
             </div>
