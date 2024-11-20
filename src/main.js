@@ -48,7 +48,7 @@ document.addEventListener('alpine:init', () => {
     }
 
     Alpine.store('user_info', {
-        user: !localStorage.getItem('stored_user') ? localStorage.getItem('stored_user') : null,
+        user: !localStorage.getItem('stored_user') ? JSON.parse(localStorage.getItem('stored_user')) : null,
         userRole: localStorage.getItem('stored_userRole') || '',
 
         reset() {
@@ -83,7 +83,7 @@ function ndrtApp() {
 
                     if (rolesDoc.exists) {
                         Alpine.store('user_info').user = user;
-                        localStorage.setItem('stored_user', user);
+                        localStorage.setItem('stored_user', JSON.stringify(user));
 
                         Alpine.store('user_info').userRole = rolesDoc.data().role;
                         localStorage.setItem('stored_userRole', rolesDoc.data().role);

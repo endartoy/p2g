@@ -32,21 +32,48 @@
         .full-height-container {
             min-height: 100vh; /* 100vh ensures the container takes at least the full height of the viewport */
         }
+        
         .navbar-item.is-active {
             background-color: hsl(171, 100%, 41%, 0.2) !important;
+        }
+
+        .content-table {
+            height: 100vh;
+            margin-bottom: 100vh;
+        }
+
+        .content-table.last {
+            margin-bottom: 0;
+        }
+
+        .table-container {
+            overflow-y: auto;
+        }
+
+        .table-container::-webkit-scrollbar {
+            width   : 3px; /* Width of the vertical scrollbar */
+        }
+
+        .table-container::-webkit-scrollbar-thumb {
+            background-color: #888; /* Scrollbar color */
+            border-radius: 3px; /* Rounded edges */
         }
 
         .is-sticky-top {
             position: sticky;
             top: 0;
             z-index: 39;
+            background-color: white;
         }
 
         /* Alert & Loading */
         .is-sticky-bottom {
-            position: sticky;
+            position: fixed;
             bottom: 0;
             z-index: 41;
+
+            left: 0;
+            width: 100%;
         }
 
         .modal-card-body.foot {
@@ -76,353 +103,914 @@
     </style>
 </head>
 
-<body class="container" x-data="appInstance">
+<body class="container" x-data="ndrtApp()">
     <!-- navbar -->
-    <div class="p-2 has-background-white" >
-        <div class="columns is-mobile is-multiline is-centered">
-            <div class="column is-full">
-                
-                <nav class="navbar has-background-success-light" role="navigation" aria-label="main navigation" style="z-index: 39;"
-                x-data="{ isActive: false }" >
-                    <div class="navbar-brand is-flex is-align-items-center">
-                        <a class="navbar-item" href="#">
-                            <!-- <img src="public/img/logo_p2g.png" alt="Logo"> -->
-                        </a>
+    <nav class="navbar has-background-success-light" role="navigation" aria-label="main navigation" style="z-index: 39;"
+    x-data="{ isActive: false }" >
+        <div class="navbar-brand is-flex is-align-items-center">
+            <a class="navbar-item" href="#">
+                <!-- <img src="public/img/logo_p2g.png" alt="Logo"> -->
+            </a>
 
-                        <span class="is-hidden-desktop">
-                            <p class="is-italic has-text-weight-semibold is-uppercase" x-text="$store.page"> DAFTAR HADIR </p>
-                        </span>
+            <span class="is-hidden-desktop">
+                <p class="is-italic has-text-weight-semibold is-uppercase" x-text="$store.page"> DAFTAR HADIR </p>
+            </span>
 
-                        <a role="button" class="navbar-burger" :class="{ 'is-active': isActive }" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" @click="isActive = !isActive" @click.outside="isActive = false" >
-                            <span aria-hidden="true"></span>
-                            <span aria-hidden="true"></span>
-                            <span aria-hidden="true"></span>
-                        </a>
-                    </div>
-
-                    <div class="navbar-menu" :class="{ 'is-active': isActive }" x-transition >
-                        <div class="navbar-start">
-                            <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'pendaftaran'}" @click="switchPage('pendaftaran')" > PENDAFTARAN </a>
-                            <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'daftar hadir'}" @click="switchPage('daftar hadir')" > DAFTAR HADIR </a>
-                            <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'data pemilih'}" @click="switchPage('data pemilih')" > DATA PEMILIH </a>
-
-
-                            <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'arisan'}" @click="switchPage('arisan')" > ARISAN </a> -->
-                            <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'tes app'}" @click="switchPage('tes app')" > TES APP </a> -->
-                        </div>
-
-                        <div class="navbar-end">
-                            <div class="navbar-item">
-                                <template x-if="$store.user_info.user">
-                                    <div class="field has-addons is-justify-content-end m-0">
-                                        <p class="control">
-                                            <button class="button is-rounded px-2">
-                                                <figure class="image">
-                                                    <img class="is-rounded" :src="$store.user_info.user.photoURL" />
-                                                </figure>
-                                                <span class="has-text-weight-semibold is-family-sans-serif is-uppercase ml-2" x-text="$store.user_info.user.displayName" ></span>
-                                            </button>
-                                        </p>
-                                        <p class="control">
-                                            <a class="button is-warning" @click="logout()" ><span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span></a>
-                                        </p>
-                                    </div>
-                                </template>      
-                                
-                                <template x-if="!$store.user_info.user">
-                                    <div class="field has-addons is-justify-content-end m-0">
-                                        <p class="control">
-                                            <a class="button is-info" @click="loginWithGoogle()" ><span class="has-text-weight-semibold" >Login</span></a>
-                                        </p>
-                                    </div>
-                                </template> 
-
-                            </div>
-                        </div>
-
-                    </div>
-                </nav>
-
-            </div>
+            <a role="button" class="navbar-burger" :class="{ 'is-active': isActive }" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample" @click="isActive = !isActive" @click.outside="isActive = false" >
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </a>
         </div>
-    </div>
 
-    <!-- Pendaftaran -->
-    <template x-if="$store.page === 'pendaftaran'" >
-        <div x-data="pendaftaran()" x-show="$store.page === 'pendaftaran' " x-transition >
-            <div class="p-2 mb-2 is-sticky-top has-background-white py-1 ">
-                <div class="columns is-mobile is-centered">
-                    <div class="column">
-                        <!-- <h1 class="is-size-4 has-text-weight-semibold"> /// </h1> -->
-                    </div>
-                    <div class="column is-narrow">
-                        <div class="field has-addons is-justify-content-end">
-                            <!-- <p class="control">
-                                <button class="button is-success" @click="printPDF()" >
-                                    <span class="icon"><i class="fas fa-print"></i></span>
-                                </button>
-                            </p> -->
+        <div class="navbar-menu" :class="{ 'is-active': isActive }" x-transition >
+            <div class="navbar-start">
+                <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'pendaftaran'}" @click="switchPage('pendaftaran')" > PENDAFTARAN </a>
+                <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'daftar hadir'}" @click="switchPage('daftar hadir')" > DAFTAR HADIR </a>
+                <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'data pemilih'}" @click="switchPage('data pemilih')" > DATA PEMILIH </a>
+
+
+                <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'arisan'}" @click="switchPage('arisan')" > ARISAN </a> -->
+                <!-- <a class="navbar-item has-text-weight-semibold is-uppercase" :class="{'is-active' : $store.page === 'tes app'}" @click="switchPage('tes app')" > TES APP </a> -->
+            </div>
+
+            <div class="navbar-end">
+                <div class="navbar-item">
+                    <template x-if="$store.user_info.user">
+                        <div class="field has-addons is-justify-content-end m-0">
                             <p class="control">
-                                <button class="button is-link" @click="openForm('form')" >
-                                    <span class="icon"><i class="fas fa-plus"></i></span>
+                                <button class="button is-rounded px-2">
+                                    <figure class="image">
+                                        <img class="is-rounded" :src="$store.user_info.user.photoURL" />
+                                    </figure>
+                                    <span class="has-text-weight-semibold is-family-sans-serif is-uppercase ml-2" x-text="$store.user_info.user.displayName" ></span>
                                 </button>
                             </p>
+                            <p class="control">
+                                <a class="button is-warning" @click="logout()" ><span class="icon is-small"><i class="fas fa-sign-out-alt"></i></span></a>
+                            </p>
                         </div>
-                    </div>
+                    </template>      
+                    
+                    <template x-if="!$store.user_info.user">
+                        <div class="field has-addons is-justify-content-end m-0">
+                            <p class="control">
+                                <a class="button is-info" @click="loginWithGoogle()" ><span class="has-text-weight-semibold" >Login</span></a>
+                            </p>
+                        </div>
+                    </template> 
+
                 </div>
             </div>
 
-            <main class="p-2 full-height-container">
-                <div class="columns is-multiline is-mobile">
-                    <div class="column is-full">
+        </div>
+    </nav>
 
-                        <template x-if="dataPrioritas.length > 0">
-                            <div class="table-container">
-                                <p class="is-uppercase is-size-5 mb-3 has-text-weight-semibold" > PRIORITAS </p>
-                                
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-danger-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 60px;">No.Urut</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                        </tr>
-                                    </thead>
+    <!-- content -->
+    <div>
+        <!-- Data Pemiilih -->
+        <template x-if="$store.page === 'data pemilih'" >
+            <div x-show="$store.page === 'data pemilih' " x-transition >
+                <!-- form  -->
+                <div class="modal is-active p-0 m-0" style="display: none" 
+                x-show="form" >
+                    <div class="modal-background"></div>
+                    <div class="modal-card m-0" x-show="form" x-transition>
+                        <header class="modal-card-head has-background-primary p-3">
+                            <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
+                            <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
+                        </header>
 
-                                    <template x-for="data in dataPrioritas">
-                                        <tbody>
-                                            <tr @click="openForm('formAksi', data);">
-                                                <td>
-                                                    <span x-text="data.tipe"></span> 
-                                                    <span x-text="data.no_urut"></span>
-                                                </td>
-                                                <td x-text="data.nama"></td>
-                                                <td class="has-text-centered" x-text="data.jk"></td>
-                                                <td x-text="data.alamat"></td>
-                                            </tr>
-                                        </tbody>
-                                    </template>
-                                </table>
+                        <!-- form -->
+                        <form @submit.prevent="saveItem()">
+                            <div class="modal-card-body has-background-primary-light p-2">
+                                <div class="columns is-mobile is-multiline m-0" >
+                                    <div class="column is-full">
+                                        <div class="field ">
+                                            <div class="control is-expanded">
+                                                <div class="select is-fullwidth" >
+                                                    <select x-model="item.tipe" :change="count_no_urut()" :disabled="item.id !== '' " required>
+                                                        <option value="DPT">DPT</option>
+                                                        <option value="DPTB">DPTB</option>
+                                                        <option value="DPK">DPK</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="control is-expanded">
+                                                <input class="input is-uppercase" type="number" placeholder="Nomor Urut" required
+                                                x-model="item.no_urut" :disabled="item.id != '' " >
+                                                <!-- <input class="input is-uppercase" type="text" inputmode="numeric" placeholder="Nomor Urut" required
+                                                x-model="item.no_urut" > -->
+                                            </div>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="control is-expanded">
+                                                <input class="input is-uppercase" type="text" placeholder="Nama" required
+                                                x-model="item.nama" >
+                                            </div>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="control is-expanded">
+                                                <input class="input is-uppercase" type="text" placeholder="NIK" 
+                                                x-model="item.nik" >
+                                            </div>
+                                        </div>
+
+                                        <div class="field ">
+                                            <div class="control is-expanded">
+                                                <div class="select is-fullwidth" >
+                                                    <select x-model="item.jk" required>
+                                                        <option value="L">Laki - Laki</option>
+                                                        <option value="P">Perempuan</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- <div class="field">
+                                            <div class="control is-expanded">
+                                                <textarea class="textarea is-uppercase" placeholder="Alamat" rows="2" required
+                                                x-model="item.alamat" > </textarea>
+                                            </div>
+                                        </div> -->
+
+                                        <div class="field" x-data="{ focused: false }" @click.outside="focused = false; dropdownItems = []" >
+                                            <div class="control">
+                                                <div class="dropdown is-active" style="width: 100%;"  >
+                                                    <div class="dropdown-trigger" style="width: 100%;">
+                                                        <input class="input is-uppercase" type="text" placeholder="ALAMAT" 
+                                                            x-model="item.alamat" 
+                                                            @input="filterAlamat()" 
+                                                            @focus="focused = true; filterAlamat();" 
+                                                            @blur="focused = false" >
+                                                    </div>
+
+                                                    <div class="dropdown-menu is-sugestion-box "
+                                                    :class="{'show': focused && dropdownItems.length > 0}" >
+                                                        <div class="dropdown-content">
+                                                            <template x-for="alamat in dropdownItems " :key="alamat" >
+                                                                <a class="dropdown-item"
+                                                                @click="item.alamat = alamat; focused = false; dropdownItems = []"> 
+                                                                    <span class="is-size-6 is-uppercase" x-text="alamat"> </span> 
+                                                                </a>
+                                                            </template>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="field">
+                                            <div class="control is-expanded">
+                                                <input class="input is-uppercase" type="number" placeholder="Umur"
+                                                x-model="item.umur" >
+                                            </div>
+                                        </div>                                
+                                    </div>
+                                </div>
                             </div>
-                        </template>
-
-                        <template x-if="dataReguler.length > 0">
-                            <div class="table-container">
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-success-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 60px;">No.Urut</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                        </tr>
-                                    </thead>
-
-                                    <template x-for="data in dataReguler">
-                                        <tbody>
-                                            <tr @click="openForm('formAksi', data);" >
-                                                <td>
-                                                    <span x-text="data.tipe"></span> 
-                                                    <span x-text="data.no_urut"></span>
-                                                </td>
-                                                <td x-text="data.nama"></td>
-                                                <td class="has-text-centered" x-text="data.jk"></td>
-                                                <td x-text="data.alamat"></td>
-                                            </tr>
-                                        </tbody>
-                                    </template>
-                                </table>
-                            </div>
-                        </template>
-
-                        <template x-if="dataPrioritas.length <= 0 && dataReguler.length <= 0">
-                            <p class="is-uppercase is-size-5 mb-3 has-text-weight-semibold has-text-centered" > Tidak ada data </p>
-                        </template>
-
+                            <footer class="modal-card-foot has-background-primary-light column py-2">      
+                                <div class="control is-flex is-justify-content-space-between">
+                                    <div>
+                                        <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
+                                            <span class="icon is-small">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div class="is-flex is-justify-content-end">
+                                        <button type="submit" class="button is-primary mx-1 has-text-black" ><strong x-text="item.id ? 'UPDATE' : 'SIMPAN'" >SIMPAN</strong></button>
+                                    </div>
+                                </div>
+                            </footer>
+                        </form>
                     </div>
                 </div>
 
-            </main>
+                <main>
+                    <!-- filter -->
+                    <div class="p-2 mb-2 is-sticky-top has-background-white py-1 ">
+                        <div class="columns is-mobile is-centered">
+                            <div class="column is-flex">
+                                <div class="is-flex">
+                                    <!-- temp delete item -->
+                                    <!-- <button class="button mr-1 is-primary" @click="" >
+                                        <span class="icon"><i class="fas fa-plus"></i></span>
+                                    </button> -->
 
-            <!-- form tambah daftar hadir -->
-            <div class="modal is-active p-0 m-0" style="display: none;" 
-            x-show="form" >
-                <div class="modal-background"></div>
-                <div class="modal-card m-0" x-show="form" x-transition style="height: 100%;">
-                    <header class="modal-card-head has-background-primary p-3">
-                        <p class="modal-card-title has-text-weight-semibold is-size-5"><span> TAMBAH DATA </span></p>
-                        <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
-                    </header>
-                    <section class="modal-card-body foot has-background-primary-light p-2">
-                        <!-- form -->
-                        <div class="columns is-mobile is-multiline m-0" >
-                            <div class="column is-full">
-                                <!-- <div class="field ">
-                                    <label class="label">Pemasukan / Pengeluaran</label>
+                                    <!-- create dummy data -->
+                                    <button x-show="dataPemilih.length <= 0" class="button mr-1 is-primary" @click="if (confirm('Create dummy data ?')) dummy()" >
+                                        <span class="icon"><i class="fas fa-plus"></i></span>
+                                    </button>
+
+                                    <!-- reset database -->
+                                    <button class="button mr-1 is-danger" @click="resetLocalDatabase()" >
+                                        <span class="icon"><i class="fas fa-sync"></i></span>
+                                    </button>
+
+                                    <!-- config pagination  -->
+                                    <button class="button mr-1 is-info" @click="config()" >
+                                        <span class="icon"><i class="fas fa-cog"></i></span>
+                                    </button>
+                                </div>
+
+                                <div class="field " :class="{'has-addons' : filterNama}" >
+                                    <div class="control is-expanded" >
+                                        <input class="input" type="text" placeholder="Nama"
+                                        x-model="filterNama" x-on:keydown="pageDPT = 1; pageDPTB = 1; pageDPK = 1;" >
+                                    </div>
+    
+                                    <p class="control" x-show="filterNama" x-transition >
+                                        <button class="button is-transparent" 
+                                        @click="filterNama='';" >
+                                            <span class="icon">
+                                                <i class="fas fa-window-close"></i>
+                                            </span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+    
+                            <div class="column is-narrow">
+                                <div class="field has-addons">
                                     <div class="control is-expanded">
                                         <div class="select is-fullwidth" >
-                                            <select x-model="newSearch.tipe">
+                                            <select x-model="filterTipe" required>
                                                 <option value="DPT">DPT</option>
                                                 <option value="DPTB">DPTB</option>
                                                 <option value="DPK">DPK</option>
+                                                <option value="SEMUA">SEMUA</option>
                                             </select>
                                         </div>
                                     </div>
-                                </div> -->
-
-                                <div class="field has-addons">
-                                    <div class="control is-expanded">
-                                        <input class="input" type="text" placeholder="Nama / No.Urut"
-                                        x-model="newSearch.query" >
-                                    </div>
-                                  </div>
+    
+                                    <p class="control">
+                                        <button class="button is-success" @click="aksi();" >
+                                            <span class="icon"><i class="fas fa-plus"></i></span>
+                                        </button>
+                                    </p>
+                                </div>
                             </div>
 
-                            <div class="column is-full">
-                                <p x-show="belumDaftar.length > 0" class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Daftar Pemilih </p>
+                        </div>
+                    </div>
 
-                                <!-- list -->
-                                <template x-if="belumDaftar.length > 0">
-                                    <template x-for="item in belumDaftar" :key="item.id">
-                                        <table class="table is-narrow is-bordered is-fullwidth mb-1">
-                                            <tbody>
-                                                <tr>
-                                                    <th rowspan="5" style="vertical-align: middle; width: 80px;">
-                                                        <span x-text="item.tipe"></span> 
-                                                        <span x-text="item.no_urut"></span>
-                                                    </th>
-                                                    <td x-text="item.nama"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td x-text="item.nik"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td x-text="item.alamat"></td>
-                                                </tr>
-                                                <tr>
-                                                    <td><span x-text="item.umur"></span> Th</td>
-                                                </tr>
-                                                <tr>
-                                                    <td class="has-text-right">
-                                                        <div class="is-flex is-justify-content-space-between">
-                                                            <label class="checkbox is-align-content-center">
-                                                                <input type="checkbox" x-model="item._prioritas" @click="item._prioritas = !item._prioritas" />
-                                                                Prioritas
-                                                            </label>
+                    <div class="columns is-multiline is-mobile">
+                        <div class="column is-full mb-1">
+                            <div class="has-text-right p-2">
+                                <div class="checkboxes card has-background-link-light is-shadowless p-1">
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[0]" :change="!tableHeader[0]" type="checkbox" />
+                                        Jenis Kelamin  
+                                    </label>
+                                
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[1]" :change="!tableHeader[1]" type="checkbox" />
+                                        Umur  
+                                    </label>
     
-                                                            <button class="button is-small is-rounded is-success py-4 has-text-black"
-                                                            @click="tambahDaftar(item)" ><i class="fas fa-plus"></i></button>
-                                                        </div>
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[2]" :change="!tableHeader[2]" type="checkbox" />
+                                        Alamat  
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- info -->
+                            <div class="p-2" x-show="dataPemilih.length > 0 && !filterNama" x-transition >
+                                <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo" >
+                                    <thead>
+                                        <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
+                                            <td style="width: 20px;"></td>
+                                            <td>DPT</td>
+                                            <td>DPTB</td>
+                                            <td>DPK</td>
+                                            <td>TOTAL</td>
+                                        </tr>
+                                    </thead>
+                                    
+                                    <tbody class="has-text-right">
+                                        <tr>
+                                            <td class="has-text-left has-text-weight-semibold" >LAKI - LAKI</td>
+                                            <td x-text="dataPemilihCount.DPT.L">DPT</td>
+                                            <td x-text="dataPemilihCount.DPTB.L">DPTB</td>
+                                            <td x-text="dataPemilihCount.DPK.L">DPK</td>
+                                            <td x-text="dataPemilihCount.TOTAL.L">SEMUA</td>
+                                        </tr>
+                                        <tr>
+                                            <td class="has-text-left has-text-weight-semibold" >PEREMPUAN</td>
+                                            <td x-text="dataPemilihCount.DPT.P">DPT</td>
+                                            <td x-text="dataPemilihCount.DPTB.P">DPTB</td>
+                                            <td x-text="dataPemilihCount.DPK.P">DPK</td>
+                                            <td x-text="dataPemilihCount.TOTAL.P">SEMUA</td>
+                                        </tr>
+                                        <tr class="has-text-weight-semibold">
+                                            <td class="has-text-left" >TOTAL</td>
+                                            <td x-text="dataPemilihByTipe.DPT.length">DPT</td>
+                                            <td x-text="dataPemilihByTipe.DPTB.length">DPTB</td>
+                                            <td x-text="dataPemilihByTipe.DPK.length">DPK</td>
+                                            <td x-text="dataPemilih.length">SEMUA</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- tidak ada data -->
+                            <div x-show="dataPemilih <= 0" x-transition >
+                                <p class="has-text-black has-text-centered is-uppercase is-size-5 has-text-weight-semibold" > Tidak ada data </p>
+                            </div>
+
+                            <!-- Tesk Hasil Pencarian -->
+                            <p x-show="filterNama" x-transition class="has-text-black has-text-centered is-uppercase is-size-5 mb-5 has-text-weight-semibold" > Hasil pencarian </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="columns is-multiline is-mobile p-0">
+                        <!-- DPT -->
+                        <div class="column is-full py-0 is-sticky-top" x-show="dataDPT.length > 0 && (filterTipe === 'DPT' || filterTipe === 'SEMUA') " x-transition >
+                            <div :class="{'last' : filterTipe != 'SEMUA' || filterNama || (dataDPTB.length == 0 && dataDPK.length == 0) }" class="content-table has-background-warning p-3 pb-5 is-flex is-flex-direction-column"  >                            
+                                <div class="table-container is-flex-grow-1 mb-2" >
+                                    <table class="table is-narrow is-hoverable is-fullwidth mb-0">
+                                        <thead class="has-background-success-light is-sticky-top">
+                                            <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-warning">
+                                                <th colspan="5">
+                                                    DPT (Daftar Pemilih Tetap) 
+                                                </th>
+                                            </tr>
+                                            <tr class="has-text-centered">
+                                                <th style="width: 30px;">#</th>
+                                                <th>Nama</th>
+                                                <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                                <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                                <th x-show="tableHeader[2]" >Alamat</th>
+                                            </tr>
+                                        </thead>
+                
+                                        <tbody>
+                                            <template x-for="(data, index) in dataDPT" :key="data.id">
+                                                <tr :class="{'has-background-danger-light' : !data._panggil}" 
+                                                @click="aksi(data);">
+                                                    <td>
+                                                        <span>
+                                                            <!-- <span x-text="data.tipe"></span>  -->
+                                                            <span x-text="data.no_urut"></span>
+                                                        </span>
+                                                    </td>
+                                                    <td >
+                                                        <span x-text="data.nama"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[0]" class="has-text-centered">
+                                                        <span x-text="data.jk"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[1]" class="has-text-centered">
+                                                        <span x-text="data.umur"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[2]" >
+                                                        <span x-text="data.alamat"></span>
                                                     </td>
                                                 </tr>
-                                            </tbody>
-                                        </table>
-                                    </template>
-                                </template>
-
-                                <p x-show="belumDaftar.length <= 0" class="has-text-black has-text-centered is-uppercase is-size-5" > Tidak ada data </p>
-                            </div>
-                        </div>
-                    </section>
-                    <!-- <footer class="modal-card-foot has-background-primary">            
-                    </footer> -->
-                </div>
-            </div>
-
-            <!-- form -->
-            <div class="modal is-active p-0 m-0" style="display: none" 
-            x-show="formAksi" >
-                <div class="modal-background"></div>
-                <div class="modal-card m-0" x-show="formAksi" x-transition>
-                    <header class="modal-card-head has-background-info-light p-3">
-                        <p class="modal-card-title has-text-weight-semibold"><span> Detail </span></p>
-                        <button class="delete button is-danger" aria-label="close" @click="resetForm('formAksi')"></button>
-                    </header>
-                    <section class="modal-card-body has-background-info-light p-2">
-                        <!-- form -->
-                        <template x-if="dataSelect">
-                            <table class="table is-narrow is-bordered is-fullwidth mb-0">
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 60px;">
-                                            <span>No</span>
-                                        </td>
-                                        <td>
-                                            <span x-text="dataSelect.tipe"></span> 
-                                            <span x-text="dataSelect.no_urut"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span>Nama</span>
-                                        </td>
-                                        <td>
-                                            <span x-text="dataSelect.nama"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span>NIK</span>
-                                        </td>
-                                        <td>
-                                            <span x-text="dataSelect.nik"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span>JK</span>
-                                        </td>
-                                        <td>
-                                            <span x-text="dataSelect.jk"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span>Alamat</span>
-                                        </td>
-                                        <td>
-                                            <span x-text="dataSelect.alamat"></span>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <span>Umur</span>
-                                        </td>
-                                        <td>
-                                            <span x-text="dataSelect.umur"></span> Th
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </template>
-                    </section>
-                    <footer class="modal-card-foot has-background-info-light is-justify-content-space-between p-2">
-                        <button class="button is-danger has-text-black" @click="hapusDaftar()" >
-                            <span class="icon is-small">
-                                <i class="fas fa-trash-alt"></i>
-                            </span>
-                        </button>
-                        <button class="button is-primary has-text-black" @click="panggil()" ><strong>PANGGIL</strong></button>
-                    </footer>
-                </div>
-            </div>
-        
-        </div>
-    </template>
-
-    <!-- Daftar Hadir -->
-    <template x-if="$store.page === 'daftar hadir' ">
-        <div x-data="_daftarHadir()" x-show="$store.page === 'daftar hadir' " x-transition >
-            <div class="p-2 mb-2 is-sticky-top has-background-white py-1">
-                <div class="columns is-mobile is-centered">
-                    <div class="column">
-                        <div class="field has-addons">
-                            <div class="control">
-                                <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
-                                x-model="filterNama" >
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
 
                                 <div>
+                                    <div class="table-container mb-2" x-show="infoHadirDPT.v">
+                                        <table class="table is-narrow is-fullwidth">
+                                            <tr> 
+                                                <td>Jumlah Pemilih Hadir</td>
+                                                <th> L : <span x-text="infoHadirDPT.L"> </span> </th>
+                                                <th> P : <span x-text="infoHadirDPT.P"> </span> </th>
+                                                <th> TOTAL : <span x-text="infoHadirDPT.L + infoHadirDPT.P"> </span> </th>
+                                            </tr>
+                                        </table>
+                                    </div>
+                
+                                    <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
+                
+                                        <!-- prev -->
+                                        <a class="pagination-previous has-background-link has-text-light"
+                                        :disabled="navDPT.prev"
+                                        @click="if (!navDPT.prev) pageDPT -= 1" >
+                                            <span><i class="fas fa-angle-double-left"></i></span>
+                                        </a>
+                
+                                        <!-- Next -->
+                                        <a class="pagination-next has-background-link has-text-light" 
+                                        :disabled="navDPT.next"
+                                        @click="if (!navDPT.next) pageDPT += 1" >
+                                            <span><i class="fas fa-angle-double-right"></i></span>
+                                        </a>
+                
+                                        <ul class="pagination-list">
+                                            <li >
+                                                <a class="pagination-link has-background-white" >
+                                                    <span x-text="pageDPT" > 1 </span> 
+                                                </a>
+                                            </li>
+                                        </ul> 
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DPTB -->
+                        <div class="column is-full py-0 is-sticky-top" x-show="dataDPTB.length > 0 && (filterTipe === 'DPTB' || filterTipe === 'SEMUA') " x-transition x-transition >
+                            <div :class="{'last' : filterTipe != 'SEMUA' || filterNama}" class="content-table has-background-primary p-3 pb-5 is-flex is-flex-direction-column"  >                            
+                                <div class="table-container is-flex-grow-1 mb-2" >
+                                    <table class="table is-narrow is-hoverable is-fullwidth mb-0">
+                                        <thead class="has-background-success-light is-sticky-top">
+                                            <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-primary">
+                                                <th colspan="5">
+                                                    DPTB (Daftar Pemilih Pindahan) 
+                                                </th>
+                                            </tr>
+                                            <tr class="has-text-centered">
+                                                <th style="width: 30px;">#</th>
+                                                <th>Nama</th>
+                                                <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                                <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                                <th x-show="tableHeader[2]" >Alamat</th>
+                                            </tr>
+                                        </thead>
+                
+                                        <tbody>
+                                            <template x-for="(data, index) in dataDPTB" :key="data.id">
+                                                <tr :class="{'has-background-danger-light' : !data._panggil}" 
+                                                @click="aksi(data);">
+                                                    <td>
+                                                        <span>
+                                                            <!-- <span x-text="data.tipe"></span>  -->
+                                                            <span x-text="data.no_urut"></span>
+                                                        </span>
+                                                    </td>
+                                                    <td >
+                                                        <span x-text="data.nama"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[0]" class="has-text-centered">
+                                                        <span x-text="data.jk"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[1]" class="has-text-centered">
+                                                        <span x-text="data.umur"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[2]" >
+                                                        <span x-text="data.alamat"></span>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div>
+                                    <div class="table-container mb-2" 
+                                    x-show="infoHadirDPTB.v">
+                                            <table class="table is-narrow is-fullwidth">
+                                                <tr> 
+                                                    <td>Jumlah Pemilih Hadir</td>
+                                                    <th> L : <span x-text="infoHadirDPTB.L"> </span> </th>
+                                                    <th> P : <span x-text="infoHadirDPTB.P"> </span> </th>
+                                                    <th> TOTAL : <span x-text="infoHadirDPTB.L + infoHadirDPTB.P"> </span> </th>
+                                                </tr>
+                                            </table>
+                                    </div>
+                
+                                    <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
+                
+                                        <!-- prev -->
+                                        <a class="pagination-previous has-background-link has-text-light"
+                                        :disabled="navDPTB.prev"
+                                        @click="if (!navDPTB.prev) pageDPTB -= 1" >
+                                            <span><i class="fas fa-angle-double-left"></i></span>
+                                        </a>
+                
+                                        <!-- Next -->
+                                        <a class="pagination-next has-background-link has-text-light" 
+                                        :disabled="navDPTB.next"
+                                        @click="if (!navDPTB.next) pageDPTB += 1" >
+                                            <span><i class="fas fa-angle-double-right"></i></span>
+                                        </a>
+                
+                                        <ul class="pagination-list">
+                                            <li >
+                                                <a class="pagination-link has-background-white" >
+                                                    <span x-text="pageDPTB" > 1 </span> 
+                                                </a>
+                                            </li>
+                                        </ul> 
+                                    </nav>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DPK -->
+                        <div class="column is-full py-0 is-sticky-top" x-show="dataDPK.length > 0 && (filterTipe === 'DPK' || filterTipe === 'SEMUA') " x-transition x-transition >
+                            <div class="content-table last has-background-success p-3 pb-5 is-flex is-flex-direction-column"  >                            
+                                <div class="table-container is-flex-grow-1 mb-2" >
+                                    <table class="table is-narrow is-hoverable is-fullwidth mb-0">
+                                        <thead class="has-background-success-light is-sticky-top">
+                                            <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-success">
+                                                <th colspan="5">
+                                                    DPK (Daftar Pemilih Tambahan) 
+                                                </th>
+                                            </tr>
+                                            <tr class="has-text-centered">
+                                                <th style="width: 30px;">#</th>
+                                                <th>Nama</th>
+                                                <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                                <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                                <th x-show="tableHeader[2]" >Alamat</th>
+                                            </tr>
+                                        </thead>
+                
+                                        <tbody>
+                                            <template x-for="(data, index) in dataDPK" :key="data.id">
+                                                <tr :class="{'has-background-danger-light' : !data._panggil}" 
+                                                @click="aksi(data);">
+                                                    <td>
+                                                        <span>
+                                                            <!-- <span x-text="data.tipe"></span>  -->
+                                                            <span x-text="data.no_urut"></span>
+                                                        </span>
+                                                    </td>
+                                                    <td >
+                                                        <span x-text="data.nama"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[0]" class="has-text-centered">
+                                                        <span x-text="data.jk"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[1]" class="has-text-centered">
+                                                        <span x-text="data.umur"></span>
+                                                    </td>
+                                                    <td x-show="tableHeader[2]" >
+                                                        <span x-text="data.alamat"></span>
+                                                    </td>
+                                                </tr>
+                                            </template>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <div>
+                                    <div class="table-container mb-2" 
+                                        x-show="infoHadirDPK.v">
+                                            <table class="table is-narrow is-fullwidth">
+                                                <tr> 
+                                                    <td>Jumlah Pemilih Hadir</td>
+                                                    <th> L : <span x-text="infoHadirDPK.L"> </span> </th>
+                                                    <th> P : <span x-text="infoHadirDPK.P"> </span> </th>
+                                                    <th> TOTAL : <span x-text="infoHadirDPK.L + infoHadirDPK.P"> </span> </th>
+                                                </tr>
+                                            </table>
+                                    </div>
+                
+                                    <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
+                
+                                        <!-- prev -->
+                                        <a class="pagination-previous has-background-link has-text-light"
+                                        :disabled="navDPK.prev"
+                                        @click="if (!navDPK.prev) pageDPK -= 1" >
+                                            <span><i class="fas fa-angle-double-left"></i></span>
+                                        </a>
+                
+                                        <!-- Next -->
+                                        <a class="pagination-next has-background-link has-text-light" 
+                                        :disabled="navDPK.next"
+                                        @click="if (!navDPK.next) pageDPK += 1" >
+                                            <span><i class="fas fa-angle-double-right"></i></span>
+                                        </a>
+                
+                                        <ul class="pagination-list">
+                                            <li >
+                                                <a class="pagination-link has-background-white" >
+                                                    <span x-text="pageDPK" > 1 </span> 
+                                                </a>
+                                            </li>
+                                        </ul> 
+                                    </nav>
+                                </div> 
+                            </div>
+                        </div>
+                    </div>
+
+                </main>
+            </div>
+        </template>
+
+        <!-- Pendaftaran -->
+        <template x-if="$store.page === 'pendaftaran'" >
+            <div x-show="$store.page === 'pendaftaran' " x-transition >
+                <main>
+
+                    <div class="p-2 mb-2 is-sticky-top has-background-white py-1 ">
+                        <div class="columns is-mobile is-centered">
+                            <div class="column is-flex is-align-items-center">
+                                <span class="is-size-4 has-text-weight-semibold ml-4" style="position: absolute !important;">
+                                    <span x-text="daftarHadir.length" > 0 </span> / 
+                                    <span x-text="dataPemilih.length"> 0 </span >
+                                </span>
+                                <progress class="progress is-large is-primary" style="height: 100%;" 
+                                x-bind:value="daftarHadir.length < 0 ? daftarHadir.length : 1" x-bind:max="dataPemilih.length"> 80% </progress>
+                            </div>
+                            <div class="column is-narrow">
+                                <div class="field has-addons is-justify-content-end">
+                                    <!-- <p class="control">
+                                        <button class="button is-success" @click="printPDF()" >
+                                            <span class="icon"><i class="fas fa-print"></i></span>
+                                        </button>
+                                    </p> -->
+                                    <p class="control">
+                                        <button class="button is-link" @click="openForm('form')" >
+                                            <span class="icon"><i class="fas fa-plus"></i></span>
+                                        </button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="columns is-multiline is-mobile">
+                        <div class="column is-full">
+
+                            <div class="has-text-right p-2">
+                                <div class="checkboxes card has-background-link-light is-shadowless p-1">
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[0]" :change="!tableHeader[0]" type="checkbox" />
+                                        Jenis Kelamin  
+                                    </label>
+                                
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[1]" :change="!tableHeader[1]" type="checkbox" />
+                                        Umur  
+                                    </label>
+    
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[2]" :change="!tableHeader[2]" type="checkbox" />
+                                        Alamat  
+                                    </label>
+                                </div>
+                            </div>
+        
+                            <div x-show="dataPrioritas.length > 0" >
+                                <div class="table-container mb-5 p-2" > 
+                                    <p class="is-uppercase is-size-5 mb-3 has-text-weight-semibold" > PRIORITAS </p>
+                                    
+                                    <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
+                                        <thead class="has-background-danger-light">
+                                            <tr class="has-text-centered">
+                                                <th style="width: 80px;">No.Urut</th>
+                                                <th>Nama</th>
+                                                <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                                <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                                <th x-show="tableHeader[2]" >Alamat</th>
+                                            </tr>
+                                        </thead>
+        
+                                        <template x-for="data in dataPrioritas">
+                                            <tbody>
+                                                <tr @click="openForm('formAksi', data);">
+                                                    <td>
+                                                        <span x-text="data.tipe"></span> 
+                                                        <span x-text="data.no_urut"></span>
+                                                    </td>
+                                                    <td x-text="data.nama"></td>
+                                                    <td x-show="tableHeader[0]" class="has-text-centered" x-text="data.jk"></td>
+                                                    <td x-show="tableHeader[1]" class="has-text-centered" x-text="data.umur"></td>
+                                                    <td x-show="tableHeader[2]" x-text="data.alamat"></td>
+                                                </tr>
+                                            </tbody>
+                                        </template>
+                                    </table>
+                                </div>
+                            </div>
+        
+                            <div x-show="dataReguler.length > 0">
+                                <div class="table-container p-2">
+                                    <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
+                                        <thead class="has-background-success-light">
+                                            <tr class="has-text-centered">
+                                                <th style="width: 80px;">No.Urut</th>
+                                                <th>Nama</th>
+                                                <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                                <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                                <th x-show="tableHeader[2]" >Alamat</th>
+                                            </tr>
+                                        </thead>
+        
+                                        <template x-for="data in dataReguler">
+                                            <tbody>
+                                                <tr @click="openForm('formAksi', data);" >
+                                                    <td>
+                                                        <span x-text="data.tipe"></span> 
+                                                        <span x-text="data.no_urut"></span>
+                                                    </td>
+                                                    <td x-text="data.nama"></td>
+                                                    <td x-show="tableHeader[0]" class="has-text-centered" x-text="data.jk"></td>
+                                                    <td x-show="tableHeader[1]" class="has-text-centered" x-text="data.jk"></td>
+                                                    <td x-show="tableHeader[2]" x-text="data.alamat"></td>
+                                                </tr>
+                                            </tbody>
+                                        </template>
+                                    </table>
+                                </div>
+                            </div>
+        
+                            <div x-show="dataPrioritas.length <= 0 && dataReguler.length <= 0">
+                                <p class="is-uppercase is-size-5 mb-3 has-text-weight-semibold has-text-centered" > Tidak ada data </p>
+                            </div>
+        
+                        </div>
+                    </div>
+
+                </main>
+
+                <!-- form tambah daftar hadir -->
+                <div class="modal is-active p-0 m-0" style="display: none;" 
+                x-show="form" x-transition >
+                    <div class="modal-background"></div>
+                    <div class="modal-card m-0" style="height: 90%;">
+                        <header class="modal-card-head has-background-primary p-3">
+                            <p class="modal-card-title has-text-weight-semibold is-size-5"><span> TAMBAH DATA </span></p>
+                            <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
+                        </header>
+                        <section class="modal-card-body foot has-background-light p-2">
+                            <!-- form -->
+                            <div class="columns is-mobile is-multiline m-0" >
+                                <div class="column is-full">
+                                    <div class="field has-addons">
+                                        <div class="control is-expanded">
+                                            <input class="input" type="text" placeholder="Nama / No.Urut" inputmode="numeric" pattern="[0-9]*"
+                                            x-model="newSearch.query" >
+                                        </div>
+                                        <p class="control">
+                                            <button class="button is-link" @click="cariBelumDaftar()" >
+                                                <span class="icon"><i class="fas fa-search"></i></span>
+                                            </button>
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div class="column is-full">
+                                    <p x-show="belumDaftar.length > 0" class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Daftar Pemilih </p>
+
+                                    <!-- list -->
+                                    <template x-if="belumDaftar.length > 0">
+                                        <template x-for="item in belumDaftar" :key="item.id">
+                                            <table class="table is-narrow is-bordered is-fullwidth mb-1"
+                                            :class="{'has-background-warning-light' : item.tipe == 'DPT', 'has-background-primary-light' : item.tipe == 'DPTB', 'has-background-success-light' : item.tipe == 'DPK'}" >
+                                                <tbody>
+                                                    <tr>
+                                                        <th rowspan="5" style="vertical-align: middle; width: 80px;">
+                                                            <span x-text="item.tipe"></span> 
+                                                            <span x-text="item.no_urut"></span>
+                                                        </th>
+                                                        <td x-text="item.nama"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td x-text="item.nik"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td x-text="item.alamat"></td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td><span x-text="item.umur"></span> Th</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td class="has-text-right">
+                                                            <div class="is-flex is-justify-content-space-between">
+                                                                <label class="checkbox is-align-content-center">
+                                                                    <input type="checkbox" x-model="item._prioritas" @click="item._prioritas = !item._prioritas" />
+                                                                    Prioritas
+                                                                </label>
+
+                                                                <button class="button is-small is-rounded is-success py-4 has-text-black"
+                                                                @click="tambahDaftar(item)" ><i class="fas fa-plus"></i></button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </template>
+                                    </template>
+
+                                    <!-- <p x-show="belumDaftar.length <= 0" class="has-text-black has-text-centered is-uppercase is-size-5" > Tidak ada data </p> -->
+                                </div>
+                            </div>
+                        </section>
+                        <!-- <footer class="modal-card-foot has-background-primary">            
+                        </footer> -->
+                    </div>
+                </div>
+
+                <!-- form panggil -->
+                <div class="modal is-active p-0 m-0" style="display: none" 
+                x-show="formAksi" x-show="formAksi" x-transition >
+                    <div class="modal-background" ></div>
+                    <div class="modal-card m-0"  >
+                        <header class="modal-card-head has-background-info-light p-3">
+                            <p class="modal-card-title has-text-weight-semibold"><span> Detail </span></p>
+                            <button class="delete button is-danger" aria-label="close" @click="resetForm('formAksi')"></button>
+                        </header>
+                        <section class="modal-card-body has-background-info-light p-2">
+                            <!-- form -->
+                            <template x-if="dataSelect">
+                                <table class="table is-narrow is-bordered is-fullwidth mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td style="width: 60px;">
+                                                <span>No</span>
+                                            </td>
+                                            <td>
+                                                <span x-text="dataSelect.tipe"></span> 
+                                                <span x-text="dataSelect.no_urut"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span>Nama</span>
+                                            </td>
+                                            <td>
+                                                <span x-text="dataSelect.nama"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span>NIK</span>
+                                            </td>
+                                            <td>
+                                                <span x-text="dataSelect.nik"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span>JK</span>
+                                            </td>
+                                            <td>
+                                                <span x-text="dataSelect.jk"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span>Alamat</span>
+                                            </td>
+                                            <td>
+                                                <span x-text="dataSelect.alamat"></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <span>Umur</span>
+                                            </td>
+                                            <td>
+                                                <span x-text="dataSelect.umur"></span> Th
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </template>
+                        </section>
+                        <footer class="modal-card-foot has-background-info-light is-justify-content-space-between p-2">
+                            <button class="button is-danger has-text-black" @click="hapusDaftar()" >
+                                <span class="icon is-small">
+                                    <i class="fas fa-trash-alt"></i>
+                                </span>
+                            </button>
+                            <button class="button is-primary has-text-black" @click="panggil()" ><strong>PANGGIL</strong></button>
+                        </footer>
+                    </div>
+                </div>
+
+            </div>
+        </template>
+
+        <!-- Daftar Hadir -->
+        <template x-if="$store.page === 'daftar hadir'" >
+            <div x-show="$store.page === 'daftar hadir'" x-transition>
+                <main>
+                    <div class="p-2 mb-2 is-sticky-top has-background-white py-1">
+                        <div class="columns is-mobile is-centered">
+                            <div class="column">
+                                <div class="field" :class="{'has-addons' : filterNama}">
+                                    <div class="control">
+                                        <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
+                                        x-model="filterNama" >
+                                    </div>
+                                    <p class="control" x-show="filterNama" @click="filterNama= ''" >
+                                        <button class="button is-transparent" >
+                                            <span class="icon">
+                                                <i class="fas fa-window-close"></i>
+                                            </span>
+                                        </button>
+                                    </p>
+                                </div>
+                                <div >
                                     <label class="checkbox is-align-content-center">
                                         <input type="checkbox" x-model="f_l" @click="f_l = !f_l; f_p = false" />
                                         Laki - laki
@@ -433,643 +1021,234 @@
                                     </label>
                                 </div>
                             </div>
-                            <!-- <div class="control">
-                                <button class="button is-success is-info" @click="cariData()" >
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div> -->
-                        </div>
-                    </div>
-                    <div class="column is-narrow">
-                            <div class="field has-addons">
-                                <div class="control is-expanded">
-                                    <div class="select is-fullwidth" >
-                                        <select x-model="filterTipe" required>
-                                            <option value="DPT">DPT</option>
-                                            <option value="DPTB">DPTB</option>
-                                            <option value="DPK">DPK</option>
-                                            <option value="SEMUA">SEMUA</option>
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <p class="control">
-                                    <button class="button is-link" @click="printPDF()" >
-                                        <span class="icon"><i class="fas fa-print"></i></span>
-                                    </button>
-                                </p>
-                            </div>
-                    </div>
-                </div>
-            </div>
-
-            <main class="p-2 full-height-container">
-                <div class="columns is-multiline is-mobile">
-                    <div class="column is-full">
-                        <p x-show="filterNama !== '' || filterJK" class="has-text-black has-text-centered is-uppercase is-size-5 mb-5 has-text-weight-semibold" > Hasil pencarian </p>
-
-                        <template x-if="daftarHadir.length > 0 && filterNama === '' && filterJK === false ">
-                            <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo" >
-                                <thead>
-                                    <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
-                                        <td style="width: 20px;"></td>
-                                        <td>DPT</td>
-                                        <td>DPTB</td>
-                                        <td>DPK</td>
-                                        <td>TOTAL</td>
-                                    </tr>
-                                </thead>
-                                
-                                <tbody class="has-text-right">
-                                    <tr>
-                                        <td class="has-text-left has-text-weight-semibold" >LAKI - LAKI</td>
-                                        <td x-text="daftarHadirDPT.filter(i => i.jk === 'L').length">DPT</td>
-                                        <td x-text="daftarHadirDPTB.filter(i => i.jk === 'L').length">DPTB</td>
-                                        <td x-text="daftarHadirDPK.filter(i => i.jk === 'L').length">DPK</td>
-                                        <td x-text="daftarHadir.filter(i => i.jk === 'L').length">SEMUA</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="has-text-left has-text-weight-semibold" >PEREMPUAN</td>
-                                        <td x-text="daftarHadirDPT.filter(i => i.jk === 'P').length">DPT</td>
-                                        <td x-text="daftarHadirDPTB.filter(i => i.jk === 'P').length">DPTB</td>
-                                        <td x-text="daftarHadirDPK.filter(i => i.jk === 'P').length">DPK</td>
-                                        <td x-text="daftarHadir.filter(i => i.jk === 'P').length">SEMUA</td>
-                                    </tr>
-                                    <tr class="has-text-weight-semibold">
-                                        <td class="has-text-left" >TOTAL</td>
-                                        <td x-text="daftarHadirDPT.length">DPT</td>
-                                        <td x-text="daftarHadirDPTB.length">DPTB</td>
-                                        <td x-text="daftarHadirDPK.length">DPK</td>
-                                        <td x-text="daftarHadir.length">SEMUA</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </template>
-                        
-                        <!-- data DPT -->
-                        <template x-if="daftarHadirDPT.length > 0 && (filterTipe === 'DPT' || filterTipe === 'SEMUA') ">
-                            <div class="table-container">
-                                <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > DPT (Daftar Pemilih Tetap)</p>
-
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-success-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 20px;" class="has-background-danger-light">#</th>
-                                            <th style="width: 50px;">No.Urut</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                            <!-- <th></th> -->
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <template x-for="(data, index) in daftarHadirDPT" :key="data.id">
-                                            <tr @click="aksi(data);">
-                                                <td class="has-text-centered has-background-danger-light">
-                                                    <span>
-                                                        <span x-text="index+1"></span> 
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.tipe"></span> 
-                                                    <span x-text="data.no_urut"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.nama"></span>
-                                                </td>
-                                                <td class="has-text-centered">
-                                                    <span x-text="data.jk"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.alamat"></span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </template>
-
-                        <!-- data DPTB -->
-                        <template x-if="daftarHadirDPTB.length > 0 && (filterTipe === 'DPTB' || filterTipe === 'SEMUA') ">
-                            <div class="table-container">
-                                <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > DPTb (Daftar Pemilih Tambahan) </p>
-
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-success-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 20px;" class="has-background-danger-light">#</th>
-                                            <th style="width: 50px;">No.Urut</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                            <!-- <th></th> -->
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <template x-for="(data, index) in daftarHadirDPTB" :key="data.id">
-                                            <tr @click="aksi(data);">
-                                                <td class="has-text-centered has-background-danger-light">
-                                                    <span>
-                                                        <span x-text="index+1"></span> 
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.tipe"></span> 
-                                                    <span x-text="data.no_urut"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.nama"></span>
-                                                </td>
-                                                <td class="has-text-centered">
-                                                    <span x-text="data.jk"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.alamat"></span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </template>
-
-                        <!-- data DPK -->
-                        <template x-if="daftarHadirDPK.length > 0 && (filterTipe === 'DPK' || filterTipe === 'SEMUA') ">
-                            <div class="table-container">
-                                <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > DPK (Daftar Pemilih Khusus) </p>
-
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-success-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 20px;" class="has-background-danger-light">#</th>
-                                            <th style="width: 50px;">No.Urut</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                            <!-- <th></th> -->
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <template x-for="(data, index) in daftarHadirDPK" :key="data.id">
-                                            <tr @click="aksi(data);">
-                                                <td class="has-text-centered has-background-danger-light">
-                                                    <span>
-                                                        <span x-text="index+1"></span> 
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.tipe"></span> 
-                                                    <span x-text="data.no_urut"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.nama"></span>
-                                                </td>
-                                                <td class="has-text-centered">
-                                                    <span x-text="data.jk"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.alamat"></span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </template>
-                        
-                        <!-- tidak ada data -->
-                        <template x-if="daftarHadir.length <= 0">
-                            <p class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Tidak ada data </p>
-                        </template>
-
-
-                    </div>
-                </div>
-
-            </main>
-
-            <!-- form  -->
-            <div class="modal is-active p-0 m-0" style="display: none" 
-            x-show="form" >
-                <div class="modal-background"></div>
-                <div class="modal-card m-0" x-show="form" x-transition>
-                    <header class="modal-card-head has-background-primary p-3">
-                        <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
-                        <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
-                    </header>
-                    <section class="modal-card-body has-background-primary-light p-2">
-                        <!-- form -->
-                        <div class="columns is-mobile is-multiline m-0" >
-                            <div class="column is-full">
-                                <table class="table is-narrow is-bordered is-fullwidth mb-1">
-                                    <tbody>
-                                        <tr>
-                                            <th rowspan="6" style="vertical-align: middle;">
-                                                <span x-text="item.tipe"></span> 
-                                                <span x-text="item.no_urut"></span>
-                                            </th>
-                                            <td x-text="item.nama"></td>
-                                          </tr>
-                                        <tr>
-                                            <td x-text="item.nik ? item.nik : '---'"></td>
-                                        </tr>
-                                        <tr>
-                                            <td x-text="item.alamat"></td>
-                                        </tr>
-                                        <tr>
-                                            <td><span x-text="item.umur ? item.umur : '**'"></span> Th</td>
-                                        </tr>
-                                        <tr>
-                                            <td><span x-text="item._panggil"></span> Th</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </section>
-
-                    <footer class="modal-card-foot has-background-primary-light column py-2">
-                        <div class="control is-flex is-justify-content-space-between">
-                            <div>
-                                <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
-                                    <span class="icon is-small">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </span>
-                                </a>
-                            </div>
-                        </div>            
-                    </footer>
-                </div>
-            </div>
-
-        </div>
-    </template>
-
-    <!-- Data Pemiilih -->
-    <template x-if="$store.page === 'data pemilih' ">
-        <div x-data="dataPemilih()" x-show="$store.page === 'data pemilih' " x-transition >
-            <div class="p-2 mb-2 is-sticky-top has-background-white py-1 ">
-                <div class="columns is-mobile is-centered">
-                    <div class="column">
-                        <div class="field has-addons">
-                            <div class="control">
-                                <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
-                                x-model="filterNama" >
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="column is-narrow">
-                        <div class="field has-addons">
-                            <div class="control is-expanded">
-                                <div class="select is-fullwidth" >
-                                    <select x-model="filterTipe" required>
-                                        <option value="DPT">DPT</option>
-                                        <option value="DPTB">DPTB</option>
-                                        <option value="DPK">DPK</option>
-                                        <option value="SEMUA">SEMUA</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <p class="control">
-                                <button class="button is-success" @click="aksi();" >
-                                    <span class="icon"><i class="fas fa-plus"></i></span>
-                                </button>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <main class="p-2 full-height-container">
-                <div class="columns is-multiline is-mobile">
-                    <div class="column is-full">
-                        <p x-show="filterNama !== ''" class="has-text-black has-text-centered is-uppercase is-size-5 mb-5 has-text-weight-semibold" > Hasil pencarian </p>
-
-                        <template x-if="dataList.length > 0 && filterNama === ''">
-                            <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo" >
-                                <thead>
-                                    <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
-                                        <td style="width: 20px;"></td>
-                                        <td>DPT</td>
-                                        <td>DPTB</td>
-                                        <td>DPK</td>
-                                        <td>TOTAL</td>
-                                    </tr>
-                                </thead>
-                                
-                                <tbody class="has-text-right">
-                                    <tr>
-                                        <td class="has-text-left has-text-weight-semibold" >LAKI - LAKI</td>
-                                        <td x-text="dataDPT.filter(i => i.jk === 'L').length">DPT</td>
-                                        <td x-text="dataDPTB.filter(i => i.jk === 'L').length">DPTB</td>
-                                        <td x-text="dataDPK.filter(i => i.jk === 'L').length">DPK</td>
-                                        <td x-text="dataList.filter(i => i.jk === 'L').length">SEMUA</td>
-                                    </tr>
-                                    <tr>
-                                        <td class="has-text-left has-text-weight-semibold" >PEREMPUAN</td>
-                                        <td x-text="dataDPT.filter(i => i.jk === 'P').length">DPT</td>
-                                        <td x-text="dataDPTB.filter(i => i.jk === 'P').length">DPTB</td>
-                                        <td x-text="dataDPK.filter(i => i.jk === 'P').length">DPK</td>
-                                        <td x-text="dataList.filter(i => i.jk === 'P').length">SEMUA</td>
-                                    </tr>
-                                    <tr class="has-text-weight-semibold">
-                                        <td class="has-text-left" >TOTAL</td>
-                                        <td x-text="dataDPT.length">DPT</td>
-                                        <td x-text="dataDPTB.length">DPTB</td>
-                                        <td x-text="dataDPK.length">DPK</td>
-                                        <td x-text="dataList.length">SEMUA</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </template>
-                        
-                        <!-- data DPT -->
-                        <template x-if="dataDPT.length > 0 && (filterTipe === 'DPT' || filterTipe === 'SEMUA') ">
-                            <div class="table-container">
-                                <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > DPT (Daftar Pemilih Tetap) </p>
-
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-success-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 30px;">No</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                            <!-- <th></th> -->
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <template x-for="(data, index) in dataDPT" :key="data.id">
-                                            <tr :class="{'has-background-danger-light' : !data._panggil}" 
-                                            @click="aksi(data);">
-                                                <td class="has-text-centered" >
-                                                    <span>
-                                                        <!-- <span x-text="data.tipe"></span>  -->
-                                                        <span x-text="data.no_urut"></span>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.nama"></span>
-                                                </td>
-                                                <td class="has-text-centered">
-                                                    <span x-text="data.jk"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.alamat"></span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </template>
-
-                        <!-- data DPTB -->
-                        <template x-if="dataDPTB.length > 0 && (filterTipe === 'DPTB' || filterTipe === 'SEMUA') ">
-                            <div class="table-container">
-                                <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > DPTb (Daftar Pemilih Tambahan) </p>
-
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-success-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 30px;">No</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                            <!-- <th></th> -->
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <template x-for="(data, index) in dataDPTB" :key="data.id">
-                                            <tr :class="{'has-background-danger-light' : !data._panggil}"
-                                            @click="aksi(data);">
-                                                <td class="has-text-centered" :class="{'has-background-danger-light' : !data._panggil }">
-                                                    <span>
-                                                        <!-- <span x-text="data.tipe"></span>  -->
-                                                        <span x-text="data.no_urut"></span>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.nama"></span>
-                                                </td>
-                                                <td class="has-text-centered">
-                                                    <span x-text="data.jk"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.alamat"></span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </template>
-
-                        <!-- data DPK -->
-                        <template x-if="dataDPK.length > 0 && (filterTipe === 'DPK' || filterTipe === 'SEMUA') ">
-                            <div class="table-container">
-                                <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > DPK (Daftar Pemilih Khusus) </p>
-
-                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
-                                    <thead class="has-background-success-light">
-                                        <tr class="has-text-centered">
-                                            <th style="width: 30px;">No</th>
-                                            <th>Nama</th>
-                                            <th style="width: 20px;">JK</th>
-                                            <th>Alamat</th>
-                                            <!-- <th></th> -->
-                                        </tr>
-                                    </thead>
-
-                                    <tbody>
-                                        <template x-for="(data, index) in dataDPK" :key="data.id">
-                                            <tr :class="{'has-background-danger-light' : !data._panggil}" 
-                                            @click="aksi(data);">
-                                                <td class="has-text-centered">
-                                                    <span>
-                                                        <!-- <span x-text="data.tipe"></span>  -->
-                                                        <span x-text="data.no_urut"></span>
-                                                    </span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.nama"></span>
-                                                </td>
-                                                <td class="has-text-centered">
-                                                    <span x-text="data.jk"></span>
-                                                </td>
-                                                <td>
-                                                    <span x-text="data.alamat"></span>
-                                                </td>
-                                            </tr>
-                                        </template>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </template>
-
-                        <!-- tidak ada data -->
-                        <template x-if="dataList.length <= 0">
-                            <p class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Tidak ada data </p>
-                        </template>
-
-
-                    </div>
-                </div>
-
-            </main>
-
-            <!-- form  -->
-            <div class="modal is-active p-0 m-0" style="display: none" 
-            x-show="form" >
-                <div class="modal-background"></div>
-                <div class="modal-card m-0" x-show="form" x-transition>
-                    <header class="modal-card-head has-background-primary p-3">
-                        <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
-                        <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
-                    </header>
-
-                    <!-- form -->
-                    <form @submit.prevent="saveItem()">
-                        <div class="modal-card-body has-background-primary-light p-2">
-                            <div class="columns is-mobile is-multiline m-0" >
-                                <div class="column is-full">
-                                    <div class="field ">
-                                        <div class="control is-expanded">
-                                            <div class="select is-fullwidth" >
-                                                <select x-model="item.tipe" :change="count_no_urut()" :disabled="item.id !== '' " required>
-                                                    <option value="DPT">DPT</option>
-                                                    <option value="DPTB">DPTB</option>
-                                                    <option value="DPK">DPK</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="number" placeholder="Nomor Urut" required
-                                            x-model="item.no_urut" >
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="text" placeholder="Nama" required
-                                            x-model="item.nama" >
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="text" placeholder="NIK" 
-                                            x-model="item.nik" >
-                                        </div>
-                                    </div>
-
-                                    <div class="field ">
-                                        <div class="control is-expanded">
-                                            <div class="select is-fullwidth" >
-                                                <select x-model="item.jk" required>
-                                                    <option value="L">Laki - Laki</option>
-                                                    <option value="P">Perempuan</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- <div class="field">
-                                        <div class="control is-expanded">
-                                            <textarea class="textarea is-uppercase" placeholder="Alamat" rows="2" required
-                                            x-model="item.alamat" > </textarea>
+                            <div class="column is-narrow">
+                                <div class="field">
+                                    <!-- <div class="control is-expanded">
+                                        <div class="select is-fullwidth" >
+                                            <select x-model="filterTipe" required>
+                                                <option value="DPT">DPT</option>
+                                                <option value="DPTB">DPTB</option>
+                                                <option value="DPK">DPK</option>
+                                                <option value="SEMUA">SEMUA</option>
+                                            </select>
                                         </div>
                                     </div> -->
-
-                                    <div class="field" x-data="{ focused: false }" @click.outside="focused = false; dropdownItems = []" >
-                                        <div class="control">
-                                            <div class="dropdown is-active" style="width: 100%;"  >
-                                                <div class="dropdown-trigger" style="width: 100%;">
-                                                    <input class="input is-uppercase" type="text" placeholder="ALAMAT" 
-                                                        x-model="item.alamat" 
-                                                        @input="filterAlamat()" 
-                                                        @focus="focused = true; filterAlamat();" 
-                                                        @blur="focused = false" >
-                                                </div>
-
-                                                <div class="dropdown-menu is-sugestion-box "
-                                                :class="{'show': focused && dropdownItems.length > 0}" >
-                                                    <div class="dropdown-content">
-                                                        <template x-for="alamat in dropdownItems " :key="alamat" >
-                                                            <a class="dropdown-item"
-                                                            @click="item.alamat = alamat; focused = false; dropdownItems = []"> 
-                                                                <span class="is-size-6 is-uppercase" x-text="alamat"> </span> 
-                                                            </a>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="number" placeholder="Umur"
-                                            x-model="item.umur" >
-                                        </div>
-                                    </div>                                
+        
+                                    <p class="control">
+                                        <button class="button is-link" @click="printPDF()" >
+                                            <span class="icon"><i class="fas fa-print"></i></span>
+                                        </button>
+                                    </p>
                                 </div>
                             </div>
                         </div>
-                        <footer class="modal-card-foot has-background-primary-light column py-2">      
+                    </div>
+
+                    <div class="columns is-multiline is-mobile">
+                        <div class="column is-full">
+                            <div class="has-text-right p-2">
+                                <div class="checkboxes card has-background-link-light is-shadowless p-1">
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[0]" :change="!tableHeader[0]" type="checkbox" />
+                                        Jenis Kelamin
+                                    </label>
+                                
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[1]" :change="!tableHeader[1]" type="checkbox" />
+                                        Umur  
+                                    </label>
+    
+                                    <label class="checkbox mr-1">
+                                        <input x-model="tableHeader[2]" :change="!tableHeader[2]" type="checkbox" />
+                                        Alamat  
+                                    </label>
+                                </div>
+                            </div>
+
+                            <!-- Info Daftar Hadir -->
+                            <div x-show="daftarHadir.length > 0 && filterNama === '' && filterJK === false" x-transition >
+                                <div class="table-container p-2">
+                                    <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo" >
+                                        <thead>
+                                            <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
+                                                <td style="width: 20px;"></td>
+                                                <td>DPT</td>
+                                                <td>DPTB</td>
+                                                <td>DPK</td>
+                                                <td>TOTAL</td>
+                                            </tr>
+                                        </thead>
+                                        
+                                        <tbody class="has-text-right">
+                                            <tr>
+                                                <td class="has-text-left has-text-weight-semibold" >LAKI - LAKI</td>
+                                                <td x-text="daftarHadirCount.DPT.L">DPT</td>
+                                                <td x-text="daftarHadirCount.DPTB.L">DPTB</td>
+                                                <td x-text="daftarHadirCount.DPK.L">DPK</td>
+                                                <td x-text="daftarHadirCount.TOTAL.L">SEMUA</td>
+                                            </tr>
+                                            <tr>
+                                                <td class="has-text-left has-text-weight-semibold" >PEREMPUAN</td>
+                                                <td x-text="daftarHadirCount.DPT.P">DPT</td>
+                                                <td x-text="daftarHadirCount.DPTB.P">DPTB</td>
+                                                <td x-text="daftarHadirCount.DPK.P">DPK</td>
+                                                <td x-text="daftarHadirCount.TOTAL.P">SEMUA</td>
+                                            </tr>
+                                            <tr class="has-text-weight-semibold">
+                                                <td class="has-text-left" >TOTAL</td>
+                                                <td x-text="daftarHadirCount.DPT.L + daftarHadirCount.DPT.P">DPT</td>
+                                                <td x-text="daftarHadirCount.DPTB.L + daftarHadirCount.DPTB.P">DPTB</td>
+                                                <td x-text="daftarHadirCount.DPK.L + daftarHadirCount.DPK.P">DPK</td>
+                                                <td x-text="daftarHadir.length">SEMUA</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            
+                            <!-- Teks hasil pencarian -->
+                            <span x-show="daftarHadir.length > 0 && filterNama" class="mb-5" x-transition >
+                                <p class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Hasil Pencarian </p>
+                            </span>
+
+                            <!-- Tidak ada data -->
+                            <span x-show="daftarHadir.length <= 0" x-transition >
+                                <p class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Tidak ada data </p>
+                            </span>
+                        </div>
+
+                        <div x-show="daftarHadir.length > 0" class="column is-full" x-transition>
+                            <div class="table-container p-2">
+                                <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > Daftar Hadir </p>
+    
+                                <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
+                                    <thead class="has-background-success-light">
+                                        <tr class="has-text-centered">
+                                            <th style="width: 20px;" class="has-background-danger-light">#</th>
+                                            <th style="width: 80px;">No.Urut</th>
+                                            <th>Nama</th>
+                                            <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                            <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                            <th x-show="tableHeader[2]" >Alamat</th>
+                                        </tr>
+                                    </thead>
+    
+                                    <tbody>
+                                        <template x-for="(data, index) in daftarHadir" :key="data.id">
+                                            <tr @click="dh_aksi(data);">
+                                                <td class="has-text-centered has-background-danger-light">
+                                                    <span>
+                                                        <span x-text="index+1"></span> 
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span x-text="data.tipe"></span> 
+                                                    <span x-text="data.no_urut"></span>
+                                                </td>
+                                                <td>
+                                                    <span x-text="data.nama"></span>
+                                                </td>
+                                                <td x-show="tableHeader[0]" class="has-text-centered">
+                                                    <span x-text="data.jk"></span>
+                                                </td>
+                                                <td x-show="tableHeader[1]" class="has-text-centered">
+                                                    <span x-text="data.umur"></span>
+                                                </td>
+                                                <td x-show="tableHeader[2]">
+                                                    <span x-text="data.alamat"></span>
+                                                </td>
+                                            </tr>
+                                        </template>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+
+                <!-- form daftar hadir -->
+                <div class="modal is-active p-0 m-0" style="display: none" 
+                x-show="form" x-transition >
+                    <div class="modal-background"></div>
+                    <div class="modal-card m-0">
+                        <header class="modal-card-head has-background-primary p-3">
+                            <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
+                            <button class="delete button is-danger" aria-label="close" @click="dh_resetForm()"></button>
+                        </header>
+                        <section class="modal-card-body has-background-primary-light p-2">
+                            <!-- form -->
+                            <div class="columns is-mobile is-multiline m-0" >
+                                <div class="column is-full">
+                                    <table class="table is-narrow is-bordered is-fullwidth mb-1">
+                                        <tbody>
+                                            <tr>
+                                                <th rowspan="6" style="vertical-align: middle;">
+                                                    <span x-text="item.tipe"></span> 
+                                                    <span x-text="item.no_urut"></span>
+                                                </th>
+                                                <td x-text="item.nama"></td>
+                                            </tr>
+                                            <tr>
+                                                <td x-text="item.nik ? item.nik : '---'"></td>
+                                            </tr>
+                                            <tr>
+                                                <td x-text="item.alamat"></td>
+                                            </tr>
+                                            <tr>
+                                                <td><span x-text="item.umur ? item.umur : '**'"></span> Th</td>
+                                            </tr>
+                                            <tr>
+                                                <td><span x-text="formatTimestamp(item._panggil)"></span></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </section>
+
+                        <footer class="modal-card-foot has-background-primary-light column py-2">
                             <div class="control is-flex is-justify-content-space-between">
                                 <div>
-                                    <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
+                                    <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="dh_deleteItem(item)">
                                         <span class="icon is-small">
                                             <i class="fas fa-trash-alt"></i>
                                         </span>
                                     </a>
                                 </div>
-                                <div class="is-flex is-justify-content-end">
-                                    <button type="submit" class="button is-primary mx-1 has-text-black" ><strong x-text="item.id ? 'UPDATE' : 'SIMPAN'" >SIMPAN</strong></button>
-                                </div>
-                            </div>
+                            </div>            
                         </footer>
-                    </form>
+                    </div>
                 </div>
             </div>
+        </template>
 
-        </div>
-    </template>
-
+    </div>
+    
     <!-- PROP -->
-    <div class="p-2 is-sticky-bottom">
-        <div class="columns is-mobile is-multiline is-centered">
-            <!-- message -->
-            <div class="column is-full" x-show="$store.message.class" x-transition>
-                <section class="alert-message is-fullwidth" >
-                    <div class="notification" :class="`${$store.message.type}`">
-                        <button class="delete" @click="$store.message.class = false"></button>
-                        <strong x-text="$store.message.text" >  </strong>
-                    </div>
-                </section>
-            </div>
-
-            <!-- loading -->
-            <div class="column is-full" x-show="$store.isLoading" x-transition >
-                <section class="alert-message is-fullwidth" >
-                    <div class="notification has-background-grey-light" >
-                        <!-- <strong> LOADING </strong> -->
-                        <progress class="progress is-link" max="100"></progress>
-                        <!-- <strong class="is-italic">. . Loading . .</strong> -->
-                    </div>
-                </section>
+    <div class="p-2 is-sticky-bottom"  >
+        <div class="container">
+            <div class="columns is-mobile is-multiline is-centered">
+                <!-- message -->
+                <div class="column is-full" x-show="$store.message.class" x-transition>
+                    <section class="alert-message is-fullwidth" >
+                        <div class="notification" :class="`${$store.message.type}`">
+                            <button class="delete" @click="$store.message.class = false"></button>
+                            <strong x-text="$store.message.text" >  </strong>
+                        </div>
+                    </section>
+                </div>
+    
+                <!-- loading -->
+                <div class="column is-full" x-show="$store.isLoading" x-transition >
+                    <section class="alert-message is-fullwidth" >
+                        <div class="notification has-background-grey-light" >
+                            <!-- <strong> LOADING </strong> -->
+                            <progress class="progress is-link" max="100"></progress>
+                            <!-- <strong class="is-italic">. . Loading . .</strong> -->
+                        </div>
+                    </section>
+                </div>
             </div>
         </div>
     </div>
