@@ -131,8 +131,8 @@ function ndrtApp() {
             }
 
             this.tableHeader = x_page == 'data pemilih' ? [true, true, true] : 
-                x_page === 'pendaftaran' ? [true, false, true] : 
-                [true, false, false]
+                x_page === 'pendaftaran' ? [false, false, true] : 
+                [true, false, true]
 
             Alpine.store('page', x_page);
             localStorage.setItem('stored_page', x_page);
@@ -161,13 +161,11 @@ function ndrtApp() {
             
             // simpan lastupdate date ke lokal storage
             localStorage.setItem('lastUpdate', this.lastUpdate.toISOString())
-            console.log('last update date =>', localStorage.getItem('lastUpdate'))
+            // console.log('last update date =>', localStorage.getItem('lastUpdate'))
         },
 
         // function to add / update data
         addOrUpdate(doc, successMessage, action){
-            Alpine.store('isLoading', true);
-
             doc.umur = +doc.umur
             doc._lastUpdate = new Date()
             
@@ -178,19 +176,21 @@ function ndrtApp() {
                 }
             });
 
+            Alpine.store('isLoading', true)
+
             db.collection('data_pemilih')
             .doc(id)
             .set(data)
             .then(() => {
                 action()
+                Alpine.store('isLoading', false);
                 successMessage()
             })
             .catch((error) => {
-                Alpine.store('message').showMessage('Error: ' + error.message, 'error');
-            })
-            .finally(() => {
                 Alpine.store('isLoading', false);
+                Alpine.store('message').showMessage('Error: ' + error.message, 'error');
             });
+
         },
 
         // 1. Data Pemilih ---------------------------------------------------------------
@@ -234,7 +234,7 @@ function ndrtApp() {
             .orderBy('_lastUpdate')
             .orderBy('no_urut', 'asc')
             .onSnapshot((snapshot) => {
-                console.log('data baru =>', snapshot.docChanges())
+                // console.log('data baru =>', snapshot.docChanges())
 
                 snapshot.docs.forEach((doc) => {
                     this.localDatabase[doc.id] = { ...doc.data() }
@@ -406,6 +406,8 @@ function ndrtApp() {
 
         // save
         saveItem(){
+            Alpine.store('isLoading', true)
+
             let data = this.item
             data.tipe = data.tipe.toUpperCase()
             data.no_urut = data.no_urut.toString().padStart(3, '0')
@@ -489,7 +491,6 @@ function ndrtApp() {
         },
 
         // 2. Pendaftaran --------------------------------------------------------------------------------
-
         // selected row
         dataSelect: null,
 
@@ -521,31 +522,23 @@ function ndrtApp() {
             let q = this.newSearch.query.toUpperCase()
 
             if (q) {
-                this.belumDaftar = this.dataPemilih.filter(doc => 
-                    ( doc.no_urut == q.toString().padStart(3, '0') ||
-                    doc.nama.includes(q) ) &&  
-                    doc._daftar == null &&
-                    doc._panggil == null
-                )
+                Alpine.store('isLoading', true)
 
-                // if (Number.isInteger(parseInt(q))) {
-                //     this.belumDaftar = this.dataPemilih.filter(doc => 
-                //         doc.no_urut == q && 
-                //         doc._daftar == null &&
-                //         doc._panggil == null
-                //     )
-                // } else {
-                //     this.belumDaftar = this.dataPemilih.filter(doc => 
-                //         doc.nama.includes(q) &&  
-                //         doc._daftar == null &&
-                //         doc._panggil == null
-                //     )
-                // }
+                setTimeout(() => {
+                    this.belumDaftar = this.dataPemilih.filter(doc => 
+                        ( doc.no_urut == q.toString().padStart(3, '0') ||
+                        doc.nama.includes(q) ) &&  
+                        doc._daftar == null &&
+                        doc._panggil == null
+                    )
+    
+                    if (this.belumDaftar.length <= 0) {
+                        Alpine.store('message').showMessage("Data tidak ditemukan", 'error')
+                        this.newSearch.query = ''
+                    }
 
-                if (this.belumDaftar.length <= 0) {
-                    Alpine.store('message').showMessage("Data tidak ditemukan", 'error')
-                    this.newSearch.query = ''
-                }
+                    Alpine.store('isLoading', false)
+                }, 500)
             } 
         },
 
@@ -856,7 +849,7 @@ function ndrtApp() {
                 const rolesRef = firebase.firestore().collection('roles').doc(user.uid);
                 const rolesDoc = await rolesRef.get();
 
-                if (rolesDoc.data().role === 'tps') {
+                if (['tps', 'superadmin'].includes(rolesDoc.data().role)) {
                     Alpine.store('user_info').user = user
                     localStorage.setItem('stored_user', JSON.stringify(user))
 
@@ -908,75 +901,5 @@ function ndrtApp() {
 
             }
         }
-    }
-}
-
-
-
-// unused
-function _dataPemilih() {
-    const initialCount = {
-        DPT: { L: 0, P: 0 },
-        DPTB: { L: 0, P: 0 },
-        DPK : { L: 0, P: 0 },
-    }
-
-    return {
-        // unused code
-        dataList: [],
-        isSearch: false,
-        countData: { ...initialCount },
-        countTotalTipe: { DPT: 0, DPTB: 0, DPK: 0 },
-        countTotalJk: { L: 0, P: 0 },
-        getCountData(){
-            db.collection('data_pemilih_count').doc('daftar_pemilih')
-            .onSnapshot((data) => {
-                this.countData = data.data()
-
-                this.countTotalJk.L = this.countData.DPT.L + this.countData.DPTB.L + this.countData.DPK.L
-                this.countTotalJk.P = this.countData.DPT.P + this.countData.DPTB.P + this.countData.DPK.P
-                
-                this.countTotalTipe.DPT = this.countData.DPT.L + this.countData.DPT.P
-                this.countTotalTipe.DPTB = this.countData.DPTB.L + this.countData.DPTB.P
-                this.countTotalTipe.DPK = this.countData.DPK.L + this.countData.DPK.P
-            }, (error) => {
-                Alpine.store('message').showMessage('Error fetching data: ' + error.message, 'error')
-            })
-        },
-
-        // create dummy data
-        dummy(){
-            let task = db.collection('data_pemilih')
-            let data = { ...initialItem }
-
-            for (let i = 1; i <= 20; i++ ) {
-                
-                data.tipe = 'DPK'
-                data.no_urut = i
-                data.nik = '111122223333000'+i
-                data.nama = 'DUMMY ' + i
-                data.alamat = Math.random() > 0.3 ? 'GADEN' : Math.random() > 0.6 ? 'PATOMAN'  : 'KARANGJOHO'
-                data.jk = Math.random() > 0.5 ? 'L' : 'P'
-                data.umur = Math.floor(Math.random() * (90 - 17 + 1) + 17 )
-
-                const {id, ...dataDummy} = data
-                                
-                task.add({...dataDummy})
-                .then(() => {
-                    this.countData[data.tipe][data.jk] += 1
-                    db.collection('data_pemilih_count').doc('daftar_pemilih').set({
-                        ...this.countData                    
-                    })
-
-                    console.log("success " + i)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    i = 20
-                })
-
-            }
-        }
-        
     }
 }

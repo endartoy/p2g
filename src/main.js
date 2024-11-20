@@ -150,7 +150,7 @@ function kasP2g() {
         newKas: { ...initialKas },
 
         init() {
-            if (Alpine.store('page') !== 'kas p2g') return;
+            // if (Alpine.store('page') !== 'kas p2g') return;
 
             this.readKas();
             const filterDate = new Date().setMonth(0,1);
@@ -548,7 +548,7 @@ function userPage() {
         rolEdit: {},
 
         init() {
-            if (Alpine.store('page') !== 'user page') return;
+            // if (Alpine.store('page') !== 'user page') return;
             if (Alpine.store('user_info').userRole !== 'superadmin') return;
             this.readUsers();
         },
