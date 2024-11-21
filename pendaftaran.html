@@ -177,6 +177,34 @@
         </div>
     </section>
 
+    <section class="section p-1">
+        <div class="container ">
+            <!-- table header config -->
+            <div class="card has-background-link-light is-shadowless has-text-right p-1 mb-3"
+            x-show="dataPemilih.length > 0" x-transition >
+                <label class="checkbox mr-1">
+                    <input x-model="tableHeader[3]" :change="!tableHeader[3]" type="checkbox" />
+                    NIK  
+                </label>
+
+                <label class="checkbox mr-1">
+                    <input x-model="tableHeader[0]" :change="!tableHeader[0]" type="checkbox" />
+                    Jenis Kelamin  
+                </label>
+            
+                <label class="checkbox mr-1">
+                    <input x-model="tableHeader[1]" :change="!tableHeader[1]" type="checkbox" />
+                    Umur  
+                </label>
+
+                <label class="checkbox mr-1">
+                    <input x-model="tableHeader[2]" :change="!tableHeader[2]" type="checkbox" />
+                    Alamat  
+                </label>
+            </div>
+        </div>
+    </section>
+
     <!-- Pendaftaran -->
     <section class="section p-1" x-show="$store.page === 'pendaftaran' " x-transition >
         <!-- <template x-if="$store.page === 'pendaftaran'"> -->
@@ -209,25 +237,6 @@
 
             <div class="columns no-side-gap is-multiline is-mobile">
                 <div class="column is-full p-0 pt-3">
-                    <!-- table header config -->
-                    <div class="card has-background-link-light is-shadowless has-text-right p-1 mb-3"
-                    x-show="dataPemilih.length > 0" x-transition >
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[0]" :change="!tableHeader[0]" type="checkbox" />
-                            Jenis Kelamin  
-                        </label>
-                    
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[1]" :change="!tableHeader[1]" type="checkbox" />
-                            Umur  
-                        </label>
-
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[2]" :change="!tableHeader[2]" type="checkbox" />
-                            Alamat  
-                        </label>
-                    </div>
-
                     <div x-show="dataPrioritas.length > 0" >
                         <div class="table-container mb-5 " > 
                             <p class="is-uppercase is-size-5 mb-3 has-text-weight-semibold" > PRIORITAS </p>
@@ -236,6 +245,7 @@
                                 <thead class="has-background-danger-light">
                                     <tr class="has-text-centered">
                                         <th style="width: 80px;">No.Urut</th>
+                                        <th x-show="tableHeader[3]" >NIK</th>
                                         <th>Nama</th>
                                         <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
                                         <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
@@ -250,6 +260,7 @@
                                                 <span x-text="data.tipe"></span> 
                                                 <span x-text="data.no_urut"></span>
                                             </td>
+                                            <td x-show="tableHeader[3]" x-text="data.nik"></td>
                                             <td x-text="data.nama"></td>
                                             <td x-show="tableHeader[0]" class="has-text-centered" x-text="data.jk"></td>
                                             <td x-show="tableHeader[1]" class="has-text-centered" x-text="data.umur"></td>
@@ -267,6 +278,7 @@
                                 <thead class="has-background-success-light">
                                     <tr class="has-text-centered">
                                         <th style="width: 80px;">No.Urut</th>
+                                        <th x-show="tableHeader[3]" >NIK</th>
                                         <th>Nama</th>
                                         <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
                                         <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
@@ -281,6 +293,7 @@
                                                 <span x-text="data.tipe"></span> 
                                                 <span x-text="data.no_urut"></span>
                                             </td>
+                                            <td x-show="tableHeader[3]" x-text="data.nik"></td>
                                             <td x-text="data.nama"></td>
                                             <td x-show="tableHeader[0]" class="has-text-centered" x-text="data.jk"></td>
                                             <td x-show="tableHeader[1]" class="has-text-centered" x-text="data.jk"></td>
@@ -387,7 +400,7 @@
                     </header>
                     <section class="modal-card-body has-background-info-light p-2">
                         <!-- form -->
-                        <template x-if="dataSelect">
+                        <!-- <template x-if="dataSelect"> -->
                             <table class="table is-narrow is-bordered is-fullwidth mb-0">
                                 <tbody>
                                     <tr>
@@ -395,8 +408,8 @@
                                             <span>No</span>
                                         </td>
                                         <td>
-                                            <span x-text="dataSelect.tipe"></span> 
-                                            <span x-text="dataSelect.no_urut"></span>
+                                            <span x-text="item.tipe"></span> 
+                                            <span x-text="item.no_urut"></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -404,7 +417,7 @@
                                             <span>Nama</span>
                                         </td>
                                         <td>
-                                            <span x-text="dataSelect.nama"></span>
+                                            <span x-text="item.nama"></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -412,7 +425,7 @@
                                             <span>NIK</span>
                                         </td>
                                         <td>
-                                            <span x-text="dataSelect.nik"></span>
+                                            <span x-text="item.nik"></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -420,7 +433,7 @@
                                             <span>JK</span>
                                         </td>
                                         <td>
-                                            <span x-text="dataSelect.jk"></span>
+                                            <span x-text="item.jk"></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -428,7 +441,7 @@
                                             <span>Alamat</span>
                                         </td>
                                         <td>
-                                            <span x-text="dataSelect.alamat"></span>
+                                            <span x-text="item.alamat"></span>
                                         </td>
                                     </tr>
                                     <tr>
@@ -436,20 +449,20 @@
                                             <span>Umur</span>
                                         </td>
                                         <td>
-                                            <span x-text="dataSelect.umur"></span> Th
+                                            <span x-text="item.umur"></span> Th
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                        </template>
+                        <!-- </template> -->
                     </section>
                     <footer class="modal-card-foot has-background-info-light is-justify-content-space-between p-2">
-                        <button class="button is-danger has-text-black" @click="hapusDaftar()" >
+                        <button class="button is-danger has-text-black" @click="hapusDaftar(item)" >
                             <span class="icon is-small">
                                 <i class="fas fa-trash-alt"></i>
                             </span>
                         </button>
-                        <button class="button is-primary has-text-black" @click="panggil()" ><strong>PANGGIL</strong></button>
+                        <button class="button is-primary has-text-black" @click="panggil(item)" ><strong>PANGGIL</strong></button>
                     </footer>
                 </div>
             </div>
@@ -469,7 +482,7 @@
                         <div class="field" :class="{'has-addons' : filterNama}">
                             <div class="control">
                                 <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
-                                x-model="filterNama" >
+                                x-model.debounce.750="filterNama" >
                             </div>
                             <p class="control" x-show="filterNama" @click="filterNama= ''" >
                                 <button class="button is-transparent" >
@@ -478,16 +491,6 @@
                                     </span>
                                 </button>
                             </p>
-                        </div>
-                        <div >
-                            <label class="checkbox is-align-content-center">
-                                <input type="checkbox" x-model="f_l" @click="f_l = !f_l; f_p = false" />
-                                Laki - laki
-                            </label>
-                            <label class="checkbox is-align-content-center ml-2">
-                                <input type="checkbox" x-model="f_p" @click="f_p = !f_p; f_l = false" />
-                                Perempuan
-                            </label>
                         </div>
                     </div>
 
@@ -518,8 +521,7 @@
             <div class="columns no-side-gap is-multiline is-mobile  m-0">
                 <div class="column is-full p-0 m-0">
                     <!-- Info Daftar Hadir -->
-                    <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo"
-                    x-show="daftarHadir.length > 0 && filterNama === '' && filterJK === false" x-transition >
+                    <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo" >
                         <thead>
                             <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
                                 <td style="width: 20px;"></td>
@@ -550,52 +552,43 @@
                                 <td x-text="daftarHadirCount.DPT.L + daftarHadirCount.DPT.P">DPT</td>
                                 <td x-text="daftarHadirCount.DPTB.L + daftarHadirCount.DPTB.P">DPTB</td>
                                 <td x-text="daftarHadirCount.DPK.L + daftarHadirCount.DPK.P">DPK</td>
-                                <td x-text="daftarHadir.length">SEMUA</td>
+                                <td x-text="daftarHadirCount.TOTAL.L + daftarHadirCount.TOTAL.P">SEMUA</td>
                             </tr>
                         </tbody>
                     </table>
-
-                    <!-- table header config -->
-                    <div class="card has-background-link-light is-shadowless has-text-right p-1 mb-3"
-                    x-show="dataPemilih.length > 0" x-transition >
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[0]" :change="!tableHeader[0]" type="checkbox" />
-                            Jenis Kelamin  
-                        </label>
-                    
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[1]" :change="!tableHeader[1]" type="checkbox" />
-                            Umur  
-                        </label>
-
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[2]" :change="!tableHeader[2]" type="checkbox" />
-                            Alamat  
-                        </label>
-                    </div>
                     
                     <!-- Teks hasil pencarian -->
                     <span x-show="daftarHadir.length > 0 && filterNama" class="mb-5" x-transition >
                         <p class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Hasil Pencarian </p>
                     </span>
 
-                    <!-- Tidak ada data -->
-                    <span x-show="daftarHadir.length <= 0" x-transition >
-                        <p class="has-text-black has-text-centered is-uppercase is-size-5 mb-3 has-text-weight-semibold" > Tidak ada data </p>
-                    </span>
                 </div>
 
                 <!-- daftar hadir -->
-                <div class="column is-full p-0" 
-                x-show="daftarHadir.length > 0" x-transition>
+                <div class="column is-full p-0" >
                     <div class="table-container">
-                        <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > Daftar Hadir </p>
+                        <div class="is-flex is-align-items-start is-justify-content-space-between">
+                            <p class="is-uppercase is-size-6 mb-3 has-text-weight-semibold" > Daftar Hadir </p>
 
-                        <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0">
+                            <p class="is-align-items-start" >
+                                <label class="checkbox is-align-content-center">
+                                    <input type="checkbox" x-model="f_l" @click="f_l = !f_l; f_p = false" />
+                                    L
+                                </label>
+                                <label class="checkbox is-align-content-center ml-2">
+                                    <input type="checkbox" x-model="f_p" @click="f_p = !f_p; f_l = false" />
+                                    P
+                                </label>
+                            </p>
+                        </div>
+
+                        <table class="table is-narrow is-hoverable is-bordered is-fullwidth mb-0"
+                        x-show="daftarHadir.length > 0" x-transition >
                             <thead class="has-background-success-light">
                                 <tr class="has-text-centered">
                                     <th style="width: 20px;" class="has-background-danger-light">#</th>
                                     <th style="width: 80px;">No.Urut</th>
+                                    <th x-show="tableHeader[3]" >NIK</th>
                                     <th>Nama</th>
                                     <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
                                     <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
@@ -614,6 +607,9 @@
                                         <td>
                                             <span x-text="data.tipe"></span> 
                                             <span x-text="data.no_urut"></span>
+                                        </td>
+                                        <td x-show="tableHeader[3]">
+                                            <span x-text="data.nik"></span>
                                         </td>
                                         <td>
                                             <span x-text="data.nama"></span>
@@ -695,536 +691,535 @@
 
     <!-- Data Pemilih -->
     <section class="section p-1 " x-show="$store.page === 'data pemilih' " x-transition >
-        <!-- <template x-if="$store.page === 'data pemilih' "> -->
-        <div class="container mb-0 pb-0">
-            <!-- filter -->
-            <div class="py-2 mb-2 is-sticky-top has-background-white ">
-                <div class="columns no-side-gap is-multiline is-mobile is-centered">
-                    <div class="column is-flex">
-                        <div class="is-flex">
-                            <!-- temp delete item -->
-                            <!-- <button class="button mr-1 is-primary" @click="" >
-                                <span class="icon"><i class="fas fa-plus"></i></span>
-                            </button> -->
+    <!-- <template x-if="$store.page === 'data pemilih' "> -->
+    <div class="container mb-0 pb-0">
+        <!-- filter -->
+        <div class="py-2 mb-2 is-sticky-top has-background-white ">
+            <div class="columns no-side-gap is-multiline is-mobile is-centered">
+                <div class="column is-flex">
+                    <div class="is-flex">
+                        <!-- temp delete item -->
+                        <!-- <button class="button mr-1 is-primary" @click="" >
+                            <span class="icon"><i class="fas fa-plus"></i></span>
+                        </button> -->
 
-                            <!-- create dummy data -->
-                            <button x-show="dataPemilih.length <= 0" class="button mr-1 is-primary" @click="if (confirm('Create dummy data ?')) dummy()" >
-                                <span class="icon"><i class="fas fa-plus"></i></span>
-                            </button>
+                        <!-- create dummy data -->
+                        <button x-show="dataPemilih.length <= 0" class="button mr-1 is-primary" @click="if (confirm('Create dummy data ?')) dummy()" >
+                            <span class="icon"><i class="fas fa-plus"></i></span>
+                        </button>
 
-                            <!-- reset database -->
-                            <button class="button mr-1 is-danger" @click="resetLocalDatabase()" >
-                                <span class="icon"><i class="fas fa-sync"></i></span>
-                            </button>
+                        <!-- reset database -->
+                        <button class="button mr-1 is-danger" @click="resetLocalDatabase()" >
+                            <span class="icon"><i class="fas fa-sync"></i></span>
+                        </button>
 
-                            <!-- config pagination  -->
-                            <button class="button mr-1 is-info" @click="config()" >
-                                <span class="icon"><i class="fas fa-cog"></i></span>
-                            </button>
-                        </div>
-
-                        <div class="field " :class="{'has-addons' : filterNama}" >
-                            <div class="control is-expanded" >
-                                <input class="input" type="text" placeholder="Nama"
-                                x-model.debounce.750="filterNama" x-on:keydown="pageDPT = 1; pageDPTB = 1; pageDPK = 1;" >
-                            </div>
-
-                            <p class="control" x-show="filterNama" x-transition >
-                                <button class="button is-transparent" 
-                                @click="filterNama='';" >
-                                    <span class="icon">
-                                        <i class="fas fa-window-close"></i>
-                                    </span>
-                                </button>
-                            </p>
-                        </div>
+                        <!-- config pagination  -->
+                        <button class="button mr-1 is-info" @click="config()" >
+                            <span class="icon"><i class="fas fa-cog"></i></span>
+                        </button>
                     </div>
 
-                    <div class="column">
-                        <div class="field has-addons">
-                            <div class="control is-expanded">
-                                <div class="select is-fullwidth" >
-                                    <select x-model="filterTipe" required>
-                                        <option value="DPT">DPT</option>
-                                        <option value="DPTB">DPTB</option>
-                                        <option value="DPK">DPK</option>
-                                        <option value="SEMUA">SEMUA</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <p class="control">
-                                <button class="button is-success" @click="aksi();" >
-                                    <span class="icon"><i class="fas fa-plus"></i></span>
-                                </button>
-                            </p>
+                    <div class="field " :class="{'has-addons' : filterNama}" >
+                        <div class="control is-expanded" >
+                            <input class="input" type="text" placeholder="Nama"
+                            x-model.debounce.750="filterNama" x-on:keydown="pageDPT = 1; pageDPTB = 1; pageDPK = 1;" >
                         </div>
+
+                        <p class="control" x-show="filterNama" x-transition >
+                            <button class="button is-transparent" 
+                            @click="filterNama='';" >
+                                <span class="icon">
+                                    <i class="fas fa-window-close"></i>
+                                </span>
+                            </button>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="column">
+                    <div class="field has-addons">
+                        <div class="control is-expanded">
+                            <div class="select is-fullwidth" >
+                                <select x-model="filterTipe" required>
+                                    <option value="DPT">DPT</option>
+                                    <option value="DPTB">DPTB</option>
+                                    <option value="DPK">DPK</option>
+                                    <option value="SEMUA">SEMUA</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <p class="control">
+                            <button class="button is-success" @click="aksi();" >
+                                <span class="icon"><i class="fas fa-plus"></i></span>
+                            </button>
+                        </p>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- info -->
-            <div class="columns no-side-gap is-multiline is-mobile m-0">
-                <div class="column m-0 p-0">
-                    <!-- info -->
-                    <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo"
-                    x-show="dataPemilih.length > 0 && !filterNama" x-transition >
-                        <thead>
-                            <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
-                                <td style="width: 20px;"></td>
-                                <td>DPT</td>
-                                <td>DPTB</td>
-                                <td>DPK</td>
-                                <td>TOTAL</td>
-                            </tr>
-                        </thead>
-                        
-                        <tbody class="has-text-right">
-                            <tr>
-                                <td class="has-text-left has-text-weight-semibold" >LAKI - LAKI</td>
-                                <td x-text="dataPemilihCount.DPT.L">DPT</td>
-                                <td x-text="dataPemilihCount.DPTB.L">DPTB</td>
-                                <td x-text="dataPemilihCount.DPK.L">DPK</td>
-                                <td x-text="dataPemilihCount.TOTAL.L">SEMUA</td>
-                            </tr>
-                            <tr>
-                                <td class="has-text-left has-text-weight-semibold" >PEREMPUAN</td>
-                                <td x-text="dataPemilihCount.DPT.P">DPT</td>
-                                <td x-text="dataPemilihCount.DPTB.P">DPTB</td>
-                                <td x-text="dataPemilihCount.DPK.P">DPK</td>
-                                <td x-text="dataPemilihCount.TOTAL.P">SEMUA</td>
-                            </tr>
-                            <tr class="has-text-weight-semibold">
-                                <td class="has-text-left" >TOTAL</td>
-                                <td x-text="dataPemilihByTipe.DPT.length">DPT</td>
-                                <td x-text="dataPemilihByTipe.DPTB.length">DPTB</td>
-                                <td x-text="dataPemilihByTipe.DPK.length">DPK</td>
-                                <td x-text="dataPemilih.length">SEMUA</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- table header config -->
-                    <div class="card has-background-link-light is-shadowless has-text-right p-1 mb-3"
-                    x-show="dataPemilih.length > 0" x-transition >
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[0]" :change="!tableHeader[0]" type="checkbox" />
-                            Jenis Kelamin  
-                        </label>
+        <!-- info -->
+        <div class="columns no-side-gap is-multiline is-mobile m-0">
+            <div class="column m-0 p-0">
+                <!-- info -->
+                <table class="table is-narrow is-bordered is-fullwidth has-text-centered" id="tableInfo"
+                x-show="dataPemilih.length > 0" x-transition >
+                    <thead>
+                        <tr class="has-background-danger-light has-text-weight-semibold has-text-right">
+                            <td style="width: 20px;"></td>
+                            <td>DPT</td>
+                            <td>DPTB</td>
+                            <td>DPK</td>
+                            <td>TOTAL</td>
+                        </tr>
+                    </thead>
                     
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[1]" :change="!tableHeader[1]" type="checkbox" />
-                            Umur  
-                        </label>
+                    <tbody class="has-text-right">
+                        <tr>
+                            <td class="has-text-left has-text-weight-semibold" >LAKI - LAKI</td>
+                            <td x-text="dataPemilihCount.DPT.L">DPT</td>
+                            <td x-text="dataPemilihCount.DPTB.L">DPTB</td>
+                            <td x-text="dataPemilihCount.DPK.L">DPK</td>
+                            <td x-text="dataPemilihCount.TOTAL.L">SEMUA</td>
+                        </tr>
 
-                        <label class="checkbox mr-1">
-                            <input x-model="tableHeader[2]" :change="!tableHeader[2]" type="checkbox" />
-                            Alamat  
-                        </label>
-                    </div>
+                        <tr>
+                            <td class="has-text-left has-text-weight-semibold" >PEREMPUAN</td>
+                            <td x-text="dataPemilihCount.DPT.P">DPT</td>
+                            <td x-text="dataPemilihCount.DPTB.P">DPTB</td>
+                            <td x-text="dataPemilihCount.DPK.P">DPK</td>
+                            <td x-text="dataPemilihCount.TOTAL.P">SEMUA</td>
+                        </tr>
 
-                    <!-- tidak ada data -->
-                    <div x-show="dataPemilih <= 0" x-transition >
-                        <p class="has-text-black has-text-centered is-uppercase is-size-5 has-text-weight-semibold" > Tidak ada data </p>
-                    </div>
+                        <tr class="has-text-weight-semibold">
+                            <td class="has-text-left" >TOTAL</td>
+                            <td x-text="dataPemilihByTipe.DPT.length">DPT</td>
+                            <td x-text="dataPemilihByTipe.DPTB.length">DPTB</td>
+                            <td x-text="dataPemilihByTipe.DPK.length">DPK</td>
+                            <td x-text="dataPemilihCount.TOTAL.L + dataPemilihCount.TOTAL.P">SEMUA</td>
+                        </tr>
+                    </tbody>
 
-                    <!-- Tesk Hasil Pencarian -->
-                    <p x-show="filterNama" x-transition class="has-text-black has-text-centered is-uppercase is-size-5 mb-5 has-text-weight-semibold" > Hasil pencarian </p>
+                </table>
+
+                <!-- tidak ada data -->
+                <div x-show="dataPemilih <= 0" x-transition >
+                    <p class="has-text-black has-text-centered is-uppercase is-size-5 has-text-weight-semibold" > Tidak ada data </p>
                 </div>
-            </div>
 
-            <!-- data -->
-            <div class="columns is-gapless is-multiline is-mobile m-0 p-0">
-                <!-- DPT -->
-                <div class="column is-full p-0 is-sticky-top" x-show="dataDPT.length > 0 && (filterTipe === 'DPT' || filterTipe === 'SEMUA') " x-transition >
-                    <div :class="{'last' : filterTipe != 'SEMUA' || filterNama || (dataDPTB.length == 0 && dataDPK.length == 0) }" class="content-table has-background-warning p-3 pb-5 is-flex is-flex-direction-column"  >                            
-                        <div class="table-container is-flex-grow-1 mb-2" >
-                            <table class="table is-narrow is-hoverable is-fullwidth mb-0">
-                                <thead class="has-background-success-light is-sticky-top">
-                                    <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-warning">
-                                        <th colspan="5">
-                                            DPT (Daftar Pemilih Tetap) 
-                                        </th>
+                <!-- Tesk Hasil Pencarian -->
+                <p x-show="filterNama" x-transition class="has-text-black has-text-centered is-uppercase is-size-5 mb-5 has-text-weight-semibold" > Hasil pencarian </p>
+            </div>
+        </div>
+
+        <!-- data -->
+        <div class="columns is-gapless is-multiline is-mobile m-0 p-0">
+            <!-- DPT -->
+            <div class="column is-full p-0 is-sticky-top" x-show="dataDPT.length > 0 && (filterTipe === 'DPT' || filterTipe === 'SEMUA') " x-transition >
+                <div :class="{'last' : filterTipe != 'SEMUA' || filterNama || (dataDPTB.length == 0 && dataDPK.length == 0) }" class="content-table has-background-warning p-3 pb-5 is-flex is-flex-direction-column">
+
+                    <div class="table-container is-flex-grow-1 mb-2" >
+                        <table class="table is-narrow is-hoverable is-fullwidth mb-0">
+                            <thead class="has-background-success-light is-sticky-top">
+                                <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-warning">
+                                    <th colspan="6">
+                                        DPT (Daftar Pemilih Tetap) 
+                                    </th>
+                                </tr>
+                                <tr class="has-text-centered">
+                                    <th style="width: 30px;">#</th>
+                                    <th x-show="tableHeader[3]">NIK</th>
+                                    <th>Nama</th>
+                                    <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                    <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                    <th x-show="tableHeader[2]" >Alamat</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template x-for="(data, index) in dataDPT" :key="data.id">
+                                    <tr :class="{'has-background-danger-light' : !data._panggil}" 
+                                    @click="aksi(data);">
+                                        <td>
+                                            <span>
+                                                <!-- <span x-text="data.tipe"></span>  -->
+                                                <span x-text="data.no_urut"></span>
+                                            </span>
+                                        </td>
+                                        <td x-show="tableHeader[3]" >
+                                            <span x-text="data.nik"></span>
+                                        </td>
+                                        <td >
+                                            <span x-text="data.nama"></span>
+                                        </td>
+                                        <td x-show="tableHeader[0]" class="has-text-centered">
+                                            <span x-text="data.jk"></span>
+                                        </td>
+                                        <td x-show="tableHeader[1]" class="has-text-centered">
+                                            <span x-text="data.umur"></span>
+                                        </td>
+                                        <td x-show="tableHeader[2]" >
+                                            <span x-text="data.alamat"></span>
+                                        </td>
                                     </tr>
-                                    <tr class="has-text-centered">
-                                        <th style="width: 30px;">#</th>
-                                        <th>Nama</th>
-                                        <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
-                                        <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
-                                        <th x-show="tableHeader[2]" >Alamat</th>
-                                    </tr>
-                                </thead>
-        
-                                <tbody>
-                                    <template x-for="(data, index) in dataDPT" :key="data.id">
-                                        <tr :class="{'has-background-danger-light' : !data._panggil}" 
-                                        @click="aksi(data);">
-                                            <td>
-                                                <span>
-                                                    <!-- <span x-text="data.tipe"></span>  -->
-                                                    <span x-text="data.no_urut"></span>
-                                                </span>
-                                            </td>
-                                            <td >
-                                                <span x-text="data.nama"></span>
-                                            </td>
-                                            <td x-show="tableHeader[0]" class="has-text-centered">
-                                                <span x-text="data.jk"></span>
-                                            </td>
-                                            <td x-show="tableHeader[1]" class="has-text-centered">
-                                                <span x-text="data.umur"></span>
-                                            </td>
-                                            <td x-show="tableHeader[2]" >
-                                                <span x-text="data.alamat"></span>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <div class="table-container mb-2" x-show="infoHadirDPT.v">
+                            <table class="table is-narrow is-fullwidth">
+                                <tr> 
+                                    <td>Jumlah Pemilih Hadir</td>
+                                    <th> L : <span x-text="infoHadirDPT.L"> </span> </th>
+                                    <th> P : <span x-text="infoHadirDPT.P"> </span> </th>
+                                    <th> TOTAL : <span x-text="infoHadirDPT.L + infoHadirDPT.P"> </span> </th>
+                                </tr>
                             </table>
                         </div>
 
-                        <div>
-                            <div class="table-container mb-2" x-show="infoHadirDPT.v">
+                        <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
+
+                            <!-- prev -->
+                            <a class="pagination-previous has-background-link has-text-light"
+                            :disabled="navDPT.prev"
+                            @click="if (!navDPT.prev) pageDPT -= 1" >
+                                <span><i class="fas fa-angle-double-left"></i></span>
+                            </a>
+
+                            <!-- Next -->
+                            <a class="pagination-next has-background-link has-text-light" 
+                            :disabled="navDPT.next"
+                            @click="if (!navDPT.next) pageDPT += 1" >
+                                <span><i class="fas fa-angle-double-right"></i></span>
+                            </a>
+
+                            <ul class="pagination-list">
+                                <li >
+                                    <a class="pagination-link has-background-white" >
+                                        <span x-text="pageDPT" > 1 </span> 
+                                    </a>
+                                </li>
+                            </ul> 
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- DPTB -->
+            <div class="column is-full p-0 is-sticky-top" x-show="dataDPTB.length > 0 && (filterTipe === 'DPTB' || filterTipe === 'SEMUA') " x-transition x-transition >
+                <div :class="{'last' : filterTipe != 'SEMUA' || filterNama || dataDPK.length == 0 }" class="content-table has-background-primary p-3 pb-5 is-flex is-flex-direction-column"  >                            
+                    
+                    <div class="table-container is-flex-grow-1 mb-2" >
+                        <table class="table is-narrow is-hoverable is-fullwidth mb-0">
+                            <thead class="has-background-success-light is-sticky-top">
+                                <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-primary">
+                                    <th colspan="6">
+                                        DPTB (Daftar Pemilih Pindahan) 
+                                    </th>
+                                </tr>
+                                <tr class="has-text-centered">
+                                    <th style="width: 30px;">#</th>
+                                    <th x-show="tableHeader[3]">NIK</th>
+                                    <th>Nama</th>
+                                    <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                    <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                    <th x-show="tableHeader[2]" >Alamat</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template x-for="(data, index) in dataDPTB" :key="data.id">
+                                    <tr :class="{'has-background-danger-light' : !data._panggil}" 
+                                    @click="aksi(data);">
+                                        <td>
+                                            <span>
+                                                <!-- <span x-text="data.tipe"></span>  -->
+                                                <span x-text="data.no_urut"></span>
+                                            </span>
+                                        </td>
+                                        <td x-show="tableHeader[3]" >
+                                            <span x-text="data.nik"></span>
+                                        </td>
+                                        <td >
+                                            <span x-text="data.nama"></span>
+                                        </td>
+                                        <td x-show="tableHeader[0]" class="has-text-centered">
+                                            <span x-text="data.jk"></span>
+                                        </td>
+                                        <td x-show="tableHeader[1]" class="has-text-centered">
+                                            <span x-text="data.umur"></span>
+                                        </td>
+                                        <td x-show="tableHeader[2]" >
+                                            <span x-text="data.alamat"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <div class="table-container mb-2" x-show="infoHadirDPTB.v">
+                            <table class="table is-narrow is-fullwidth">
+                                <tr> 
+                                    <td>Jumlah Pemilih Hadir</td>
+                                    <th> L : <span x-text="infoHadirDPTB.L"> </span> </th>
+                                    <th> P : <span x-text="infoHadirDPTB.P"> </span> </th>
+                                    <th> TOTAL : <span x-text="infoHadirDPTB.L + infoHadirDPTB.P"> </span> </th>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
+
+                            <!-- prev -->
+                            <a class="pagination-previous has-background-link has-text-light"
+                            :disabled="navDPTB.prev"
+                            @click="if (!navDPTB.prev) pageDPTB -= 1" >
+                                <span><i class="fas fa-angle-double-left"></i></span>
+                            </a>
+
+                            <!-- Next -->
+                            <a class="pagination-next has-background-link has-text-light" 
+                            :disabled="navDPTB.next"
+                            @click="if (!navDPTB.next) pageDPTB += 1" >
+                                <span><i class="fas fa-angle-double-right"></i></span>
+                            </a>
+
+                            <ul class="pagination-list">
+                                <li >
+                                    <a class="pagination-link has-background-white" >
+                                        <span x-text="pageDPTB" > 1 </span> 
+                                    </a>
+                                </li>
+                            </ul> 
+                        </nav>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- DPK -->
+            <div class="column is-full p-0 is-sticky-top" x-show="dataDPK.length > 0 && (filterTipe === 'DPK' || filterTipe === 'SEMUA') " x-transition x-transition >
+                <div class="content-table last has-background-success p-3 pb-5 is-flex is-flex-direction-column"  >                            
+                    <div class="table-container is-flex-grow-1 mb-2" >
+                        <table class="table is-narrow is-hoverable is-fullwidth mb-0">
+                            <thead class="has-background-success-light is-sticky-top">
+                                <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-success">
+                                    <th colspan="6">
+                                        DPK (Daftar Pemilih Tambahan) 
+                                    </th>
+                                </tr>
+                                <tr class="has-text-centered">
+                                    <th style="width: 30px;">#</th>
+                                    <th x-show="tableHeader[3]">NIK</th>
+                                    <th>Nama</th>
+                                    <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
+                                    <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
+                                    <th x-show="tableHeader[2]" >Alamat</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <template x-for="(data, index) in dataDPK" :key="data.id">
+                                    <tr :class="{'has-background-danger-light' : !data._panggil}" 
+                                    @click="aksi(data);">
+                                        <td>
+                                            <span>
+                                                <!-- <span x-text="data.tipe"></span>  -->
+                                                <span x-text="data.no_urut"></span>
+                                            </span>
+                                        </td>
+                                        <td x-show="tableHeader[3]" >
+                                            <span x-text="data.nik"></span>
+                                        </td>
+                                        <td >
+                                            <span x-text="data.nama"></span>
+                                        </td>
+                                        <td x-show="tableHeader[0]" class="has-text-centered">
+                                            <span x-text="data.jk"></span>
+                                        </td>
+                                        <td x-show="tableHeader[1]" class="has-text-centered">
+                                            <span x-text="data.umur"></span>
+                                        </td>
+                                        <td x-show="tableHeader[2]" >
+                                            <span x-text="data.alamat"></span>
+                                        </td>
+                                    </tr>
+                                </template>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <div class="table-container mb-2" 
+                            x-show="infoHadirDPK.v">
                                 <table class="table is-narrow is-fullwidth">
                                     <tr> 
                                         <td>Jumlah Pemilih Hadir</td>
-                                        <th> L : <span x-text="infoHadirDPT.L"> </span> </th>
-                                        <th> P : <span x-text="infoHadirDPT.P"> </span> </th>
-                                        <th> TOTAL : <span x-text="infoHadirDPT.L + infoHadirDPT.P"> </span> </th>
+                                        <th> L : <span x-text="infoHadirDPK.L"> </span> </th>
+                                        <th> P : <span x-text="infoHadirDPK.P"> </span> </th>
+                                        <th> TOTAL : <span x-text="infoHadirDPK.L + infoHadirDPK.P"> </span> </th>
                                     </tr>
                                 </table>
-                            </div>
-        
-                            <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
-        
-                                <!-- prev -->
-                                <a class="pagination-previous has-background-link has-text-light"
-                                :disabled="navDPT.prev"
-                                @click="if (!navDPT.prev) pageDPT -= 1" >
-                                    <span><i class="fas fa-angle-double-left"></i></span>
-                                </a>
-        
-                                <!-- Next -->
-                                <a class="pagination-next has-background-link has-text-light" 
-                                :disabled="navDPT.next"
-                                @click="if (!navDPT.next) pageDPT += 1" >
-                                    <span><i class="fas fa-angle-double-right"></i></span>
-                                </a>
-        
-                                <ul class="pagination-list">
-                                    <li >
-                                        <a class="pagination-link has-background-white" >
-                                            <span x-text="pageDPT" > 1 </span> 
-                                        </a>
-                                    </li>
-                                </ul> 
-                            </nav>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- DPTB -->
-                <div class="column is-full p-0 is-sticky-top" x-show="dataDPTB.length > 0 && (filterTipe === 'DPTB' || filterTipe === 'SEMUA') " x-transition x-transition >
-                    <div :class="{'last' : filterTipe != 'SEMUA' || filterNama || dataDPK.length == 0 }" class="content-table has-background-primary p-3 pb-5 is-flex is-flex-direction-column"  >                            
-                        <div class="table-container is-flex-grow-1 mb-2" >
-                            <table class="table is-narrow is-hoverable is-fullwidth mb-0">
-                                <thead class="has-background-success-light is-sticky-top">
-                                    <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-primary">
-                                        <th colspan="5">
-                                            DPTB (Daftar Pemilih Pindahan) 
-                                        </th>
-                                    </tr>
-                                    <tr class="has-text-centered">
-                                        <th style="width: 30px;">#</th>
-                                        <th>Nama</th>
-                                        <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
-                                        <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
-                                        <th x-show="tableHeader[2]" >Alamat</th>
-                                    </tr>
-                                </thead>
-        
-                                <tbody>
-                                    <template x-for="(data, index) in dataDPTB" :key="data.id">
-                                        <tr :class="{'has-background-danger-light' : !data._panggil}" 
-                                        @click="aksi(data);">
-                                            <td>
-                                                <span>
-                                                    <!-- <span x-text="data.tipe"></span>  -->
-                                                    <span x-text="data.no_urut"></span>
-                                                </span>
-                                            </td>
-                                            <td >
-                                                <span x-text="data.nama"></span>
-                                            </td>
-                                            <td x-show="tableHeader[0]" class="has-text-centered">
-                                                <span x-text="data.jk"></span>
-                                            </td>
-                                            <td x-show="tableHeader[1]" class="has-text-centered">
-                                                <span x-text="data.umur"></span>
-                                            </td>
-                                            <td x-show="tableHeader[2]" >
-                                                <span x-text="data.alamat"></span>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
                         </div>
 
-                        <div>
-                            <div class="table-container mb-2" 
-                            x-show="infoHadirDPTB.v">
-                                    <table class="table is-narrow is-fullwidth">
-                                        <tr> 
-                                            <td>Jumlah Pemilih Hadir</td>
-                                            <th> L : <span x-text="infoHadirDPTB.L"> </span> </th>
-                                            <th> P : <span x-text="infoHadirDPTB.P"> </span> </th>
-                                            <th> TOTAL : <span x-text="infoHadirDPTB.L + infoHadirDPTB.P"> </span> </th>
-                                        </tr>
-                                    </table>
-                            </div>
-        
-                            <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
-        
-                                <!-- prev -->
-                                <a class="pagination-previous has-background-link has-text-light"
-                                :disabled="navDPTB.prev"
-                                @click="if (!navDPTB.prev) pageDPTB -= 1" >
-                                    <span><i class="fas fa-angle-double-left"></i></span>
-                                </a>
-        
-                                <!-- Next -->
-                                <a class="pagination-next has-background-link has-text-light" 
-                                :disabled="navDPTB.next"
-                                @click="if (!navDPTB.next) pageDPTB += 1" >
-                                    <span><i class="fas fa-angle-double-right"></i></span>
-                                </a>
-        
-                                <ul class="pagination-list">
-                                    <li >
-                                        <a class="pagination-link has-background-white" >
-                                            <span x-text="pageDPTB" > 1 </span> 
-                                        </a>
-                                    </li>
-                                </ul> 
-                            </nav>
-                        </div>
-                    </div>
-                </div>
+                        <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
 
-                <!-- DPK -->
-                <div class="column is-full p-0 is-sticky-top" x-show="dataDPK.length > 0 && (filterTipe === 'DPK' || filterTipe === 'SEMUA') " x-transition x-transition >
-                    <div class="content-table last has-background-success p-3 pb-5 is-flex is-flex-direction-column"  >                            
-                        <div class="table-container is-flex-grow-1 mb-2" >
-                            <table class="table is-narrow is-hoverable is-fullwidth mb-0">
-                                <thead class="has-background-success-light is-sticky-top">
-                                    <tr class="has-text-centered is-uppercase is-size-6 has-text-weight-semibold has-background-success">
-                                        <th colspan="5">
-                                            DPK (Daftar Pemilih Tambahan) 
-                                        </th>
-                                    </tr>
-                                    <tr class="has-text-centered">
-                                        <th style="width: 30px;">#</th>
-                                        <th>Nama</th>
-                                        <th x-show="tableHeader[0]" style="width: 20px;">JK</th>
-                                        <th x-show="tableHeader[1]" style="width: 20px;">Umur</th>
-                                        <th x-show="tableHeader[2]" >Alamat</th>
-                                    </tr>
-                                </thead>
-        
-                                <tbody>
-                                    <template x-for="(data, index) in dataDPK" :key="data.id">
-                                        <tr :class="{'has-background-danger-light' : !data._panggil}" 
-                                        @click="aksi(data);">
-                                            <td>
-                                                <span>
-                                                    <!-- <span x-text="data.tipe"></span>  -->
-                                                    <span x-text="data.no_urut"></span>
-                                                </span>
-                                            </td>
-                                            <td >
-                                                <span x-text="data.nama"></span>
-                                            </td>
-                                            <td x-show="tableHeader[0]" class="has-text-centered">
-                                                <span x-text="data.jk"></span>
-                                            </td>
-                                            <td x-show="tableHeader[1]" class="has-text-centered">
-                                                <span x-text="data.umur"></span>
-                                            </td>
-                                            <td x-show="tableHeader[2]" >
-                                                <span x-text="data.alamat"></span>
-                                            </td>
-                                        </tr>
-                                    </template>
-                                </tbody>
-                            </table>
-                        </div>
+                            <!-- prev -->
+                            <a class="pagination-previous has-background-link has-text-light"
+                            :disabled="navDPK.prev"
+                            @click="if (!navDPK.prev) pageDPK -= 1" >
+                                <span><i class="fas fa-angle-double-left"></i></span>
+                            </a>
 
-                        <div>
-                            <div class="table-container mb-2" 
-                                x-show="infoHadirDPK.v">
-                                    <table class="table is-narrow is-fullwidth">
-                                        <tr> 
-                                            <td>Jumlah Pemilih Hadir</td>
-                                            <th> L : <span x-text="infoHadirDPK.L"> </span> </th>
-                                            <th> P : <span x-text="infoHadirDPK.P"> </span> </th>
-                                            <th> TOTAL : <span x-text="infoHadirDPK.L + infoHadirDPK.P"> </span> </th>
-                                        </tr>
-                                    </table>
-                            </div>
-        
-                            <nav class="pagination is-centered is-small" role="navigation" aria-label="pagination">
-        
-                                <!-- prev -->
-                                <a class="pagination-previous has-background-link has-text-light"
-                                :disabled="navDPK.prev"
-                                @click="if (!navDPK.prev) pageDPK -= 1" >
-                                    <span><i class="fas fa-angle-double-left"></i></span>
-                                </a>
-        
-                                <!-- Next -->
-                                <a class="pagination-next has-background-link has-text-light" 
-                                :disabled="navDPK.next"
-                                @click="if (!navDPK.next) pageDPK += 1" >
-                                    <span><i class="fas fa-angle-double-right"></i></span>
-                                </a>
-        
-                                <ul class="pagination-list">
-                                    <li >
-                                        <a class="pagination-link has-background-white" >
-                                            <span x-text="pageDPK" > 1 </span> 
-                                        </a>
-                                    </li>
-                                </ul> 
-                            </nav>
-                        </div> 
-                    </div>
-                </div>
-            </div>
+                            <!-- Next -->
+                            <a class="pagination-next has-background-link has-text-light" 
+                            :disabled="navDPK.next"
+                            @click="if (!navDPK.next) pageDPK += 1" >
+                                <span><i class="fas fa-angle-double-right"></i></span>
+                            </a>
 
-            <!-- form  -->
-            <div class="modal is-active p-0 m-0" style="display: none" 
-            x-show="form" >
-                <div class="modal-background"></div>
-                <div class="modal-card m-0" x-show="form" x-transition>
-                    <header class="modal-card-head has-background-primary p-3">
-                        <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
-                        <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
-                    </header>
-
-                    <!-- form -->
-                    <form @submit.prevent="saveItem()">
-                        <div class="modal-card-body has-background-primary-light p-2">
-                            <div class="columns is-mobile is-multiline m-0" >
-                                <div class="column is-full">
-                                    <div class="field ">
-                                        <div class="control is-expanded">
-                                            <div class="select is-fullwidth" >
-                                                <select x-model="item.tipe" :change="count_no_urut()" :disabled="item.id !== '' " required>
-                                                    <option value="DPT">DPT</option>
-                                                    <option value="DPTB">DPTB</option>
-                                                    <option value="DPK">DPK</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="number" placeholder="Nomor Urut" required
-                                            x-model="item.no_urut" :disabled="item.id != '' " >
-                                            <!-- <input class="input is-uppercase" type="text" inputmode="numeric" placeholder="Nomor Urut" required
-                                            x-model="item.no_urut" > -->
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="text" placeholder="Nama" required
-                                            x-model="item.nama" >
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="text" placeholder="NIK" 
-                                            x-model="item.nik" >
-                                        </div>
-                                    </div>
-
-                                    <div class="field ">
-                                        <div class="control is-expanded">
-                                            <div class="select is-fullwidth" >
-                                                <select x-model="item.jk" required>
-                                                    <option value="L">Laki - Laki</option>
-                                                    <option value="P">Perempuan</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <!-- <div class="field">
-                                        <div class="control is-expanded">
-                                            <textarea class="textarea is-uppercase" placeholder="Alamat" rows="2" required
-                                            x-model="item.alamat" > </textarea>
-                                        </div>
-                                    </div> -->
-
-                                    <div class="field" x-data="{ focused: false }" @click.outside="focused = false; dropdownItems = []" >
-                                        <div class="control">
-                                            <div class="dropdown is-active" style="width: 100%;"  >
-                                                <div class="dropdown-trigger" style="width: 100%;">
-                                                    <input class="input is-uppercase" type="text" placeholder="ALAMAT" 
-                                                        x-model="item.alamat" 
-                                                        @input="filterAlamat()" 
-                                                        @focus="focused = true; filterAlamat();" 
-                                                        @blur="focused = false" >
-                                                </div>
-
-                                                <div class="dropdown-menu is-sugestion-box "
-                                                :class="{'show': focused && dropdownItems.length > 0}" >
-                                                    <div class="dropdown-content">
-                                                        <template x-for="alamat in dropdownItems " :key="alamat" >
-                                                            <a class="dropdown-item"
-                                                            @click="item.alamat = alamat; focused = false; dropdownItems = []"> 
-                                                                <span class="is-size-6 is-uppercase" x-text="alamat"> </span> 
-                                                            </a>
-                                                        </template>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="field">
-                                        <div class="control is-expanded">
-                                            <input class="input is-uppercase" type="number" placeholder="Umur"
-                                            x-model="item.umur" >
-                                        </div>
-                                    </div>                                
-                                </div>
-                            </div>
-                        </div>
-                        <footer class="modal-card-foot has-background-primary-light column py-2">      
-                            <div class="control is-flex is-justify-content-space-between">
-                                <div>
-                                    <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
-                                        <span class="icon is-small">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </span>
+                            <ul class="pagination-list">
+                                <li >
+                                    <a class="pagination-link has-background-white" >
+                                        <span x-text="pageDPK" > 1 </span> 
                                     </a>
-                                </div>
-                                <div class="is-flex is-justify-content-end">
-                                    <button type="submit" class="button is-primary mx-1 has-text-black" ><strong x-text="item.id ? 'UPDATE' : 'SIMPAN'" >SIMPAN</strong></button>
-                                </div>
-                            </div>
-                        </footer>
-                    </form>
+                                </li>
+                            </ul> 
+                        </nav>
+                    </div> 
                 </div>
             </div>
-
         </div>
-        <!-- </template> -->
+
+        <!-- form  -->
+        <div class="modal is-active p-0 m-0" style="display: none" 
+        x-show="form" >
+            <div class="modal-background"></div>
+            <div class="modal-card m-0" x-show="form" x-transition>
+                <header class="modal-card-head has-background-primary p-3">
+                    <p class="modal-card-title has-text-weight-semibold"><span> Data Pemilih </span></p>
+                    <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
+                </header>
+
+                <!-- form -->
+                <form @submit.prevent="saveItem()">
+                    <div class="modal-card-body has-background-primary-light p-2">
+                        <div class="columns is-mobile is-multiline m-0" >
+                            <div class="column is-full">
+                                <div class="field ">
+                                    <div class="control is-expanded">
+                                        <div class="select is-fullwidth" >
+                                            <select x-model="item.tipe" :change="count_no_urut()" :disabled="item.id !== '' " required>
+                                                <option value="DPT">DPT</option>
+                                                <option value="DPTB">DPTB</option>
+                                                <option value="DPK">DPK</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <div class="control is-expanded">
+                                        <input class="input is-uppercase" type="number" placeholder="Nomor Urut" required
+                                        x-model="item.no_urut" :disabled="item.id != '' " >
+                                        <!-- <input class="input is-uppercase" type="text" inputmode="numeric" placeholder="Nomor Urut" required
+                                        x-model="item.no_urut" > -->
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <div class="control is-expanded">
+                                        <input class="input is-uppercase" type="text" placeholder="Nama" required
+                                        x-model="item.nama" >
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <div class="control is-expanded">
+                                        <input class="input is-uppercase" type="text" placeholder="NIK" 
+                                        x-model="item.nik" >
+                                    </div>
+                                </div>
+
+                                <div class="field ">
+                                    <div class="control is-expanded">
+                                        <div class="select is-fullwidth" >
+                                            <select x-model="item.jk" required>
+                                                <option value="L">Laki - Laki</option>
+                                                <option value="P">Perempuan</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="field">
+                                    <div class="control is-expanded">
+                                        <textarea class="textarea is-uppercase" placeholder="Alamat" rows="2" required
+                                        x-model="item.alamat" > </textarea>
+                                    </div>
+                                </div> -->
+
+                                <div class="field" x-data="{ focused: false }" @click.outside="focused = false; dropdownItems = []" >
+                                    <div class="control">
+                                        <div class="dropdown is-active" style="width: 100%;"  >
+                                            <div class="dropdown-trigger" style="width: 100%;">
+                                                <input class="input is-uppercase" type="text" placeholder="ALAMAT" 
+                                                    x-model="item.alamat" 
+                                                    @input="filterAlamat()" 
+                                                    @focus="focused = true; filterAlamat();" 
+                                                    @blur="focused = false" >
+                                            </div>
+
+                                            <div class="dropdown-menu is-sugestion-box "
+                                            :class="{'show': focused && dropdownItems.length > 0}" >
+                                                <div class="dropdown-content">
+                                                    <template x-for="alamat in dropdownItems " :key="alamat" >
+                                                        <a class="dropdown-item"
+                                                        @click="item.alamat = alamat; focused = false; dropdownItems = []"> 
+                                                            <span class="is-size-6 is-uppercase" x-text="alamat"> </span> 
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="field">
+                                    <div class="control is-expanded">
+                                        <input class="input is-uppercase" type="number" placeholder="Umur"
+                                        x-model="item.umur" >
+                                    </div>
+                                </div>                                
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="modal-card-foot has-background-primary-light column py-2">      
+                        <div class="control is-flex is-justify-content-space-between">
+                            <div>
+                                <a class="button is-danger mx-1 has-text-black" x-show="item.id" @click="deleteItem(item)">
+                                    <span class="icon is-small">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="is-flex is-justify-content-end">
+                                <button type="submit" class="button is-primary mx-1 has-text-black" ><strong x-text="item.id ? 'UPDATE' : 'SIMPAN'" >SIMPAN</strong></button>
+                            </div>
+                        </div>
+                    </footer>
+                </form>
+            </div>
+        </div>
+
+    </div>
+    <!-- </template> -->
     </section>
 
     <!-- Notif and loading -->

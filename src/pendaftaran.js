@@ -130,17 +130,13 @@ function ndrtApp() {
                 return
             }
 
-            this.tableHeader = x_page == 'data pemilih' ? [true, true, true] : 
-                x_page === 'pendaftaran' ? [false, false, true] : 
-                [true, false, true]
-
             Alpine.store('page', x_page);
             localStorage.setItem('stored_page', x_page);
         },
 
         // Prop
         // JK, Umur, Alamat
-        tableHeader: [true, false, true],
+        tableHeader: [true, false, true, false], // JK, Umur, Alamat, NIK
 
         form: false,
         formAksi: false,
@@ -501,9 +497,6 @@ function ndrtApp() {
         },
 
         // 2. Pendaftaran --------------------------------------------------------------------------------
-        // selected row
-        dataSelect: null,
-
         // get & filter data anrtian
         get dataPrioritas() {
             const data = this.dataPemilih.filter(doc => 
@@ -570,12 +563,10 @@ function ndrtApp() {
         },
 
         // hapus dari antrian
-        hapusDaftar() {
-            if (this.dataSelect.id !== null) {
-                if (confirm("Hapus "+ this.dataSelect.nama +" dari antrian ?")) {
-
-                    let data = this.dataSelect
-
+        hapusDaftar(item) {
+            if (item.id !== null) {
+                if (confirm("Hapus "+ item.nama +" dari antrian ?")) {
+                    let data = item
                     data._daftar = null
                 
                     let message = () => Alpine.store('message').showMessage('Hapus data berhasil')
@@ -589,27 +580,21 @@ function ndrtApp() {
         },
 
         // panggil antrian
-        panggil() {
-            if (this.dataSelect.id !== null) {
-                const doX = confirm("Panggil "+ this.dataSelect.nama +" dari antrian ?")
+        panggil(item) {
+            if (item.id !== null) {
+                const doX = confirm("Panggil "+ item.nama +" dari antrian ?")
                 if (!doX) return;
 
-                this.dataSelect._lastUpdate = new Date()
-                this.dataSelect._panggil = new Date()
+                let data = item
+                data._panggil = new Date()
+            
+                let message = () => Alpine.store('message').showMessage('Hapus data berhasil')
+                let action = () =>  {
+                    this.resetForm('formAksi')
+                    Alpine.store('message').showMessage('Done');             
+                }
 
-                const {id, ...data} = this.dataSelect
-                
-                Alpine.store('isLoading', true);
-                db.collection('data_pemilih').doc(id).update({
-                    ...data
-                }).then(() => {
-                    Alpine.store('message').showMessage('Done');
-                    this.resetForm('formAksi');
-                }).catch((error) => {
-                    Alpine.store('message').showMessage('Error: ' + error.message, 'error');
-                }).finally(() => {
-                    Alpine.store('isLoading', false);
-                });
+                this.addOrUpdate(data, message, action)
             }
         },
 
@@ -620,10 +605,12 @@ function ndrtApp() {
                 this.belumDaftar = [];
             } else if (q == 'formAksi') {
                 this.formAksi = false
-                this.dataSelect = null;
+                this.item = { ...initialItem }
             }
 
+            // enable scroll
             document.documentElement.classList.remove('is-clipped')
+            
             // Listen for the back button press
             history.pushState(null, '', '');
         },
@@ -633,10 +620,12 @@ function ndrtApp() {
                 this.form = true
             } else if (q == 'formAksi') {
                 this.formAksi = true
-                this.dataSelect = data
+                this.item = { ...data }
             }
 
+            // disable scroll
             document.documentElement.classList.add('is-clipped')
+
             // Listen for the back button press
             history.pushState(null, '', '');
             window.addEventListener('popstate', () => { this.resetForm(q); });
@@ -893,8 +882,8 @@ function ndrtApp() {
                 data.tipe = 'DPT'
                 data.no_urut = i.toString().padStart(3, '0')
                 data.nik = '111122223333000'+i
-                data.nama = 'DUMMY ' + i
-                data.alamat = Math.random() > 0.3 ? 'GADEN' : Math.random() > 0.6 ? 'PATOMAN'  : 'KARANGJOHO'
+                data.nama = 'ABDUL RAHIM ' + i
+                data.alamat = Math.random() > 0.3 ? 'DK GADEN 003/006' : Math.random() > 0.6 ? 'DK PATOMAN 002/003'  : 'DK KARANGJOHO 003/003'
                 data.jk = Math.random() > 0.5 ? 'L' : 'P'
                 data.umur = Math.floor(Math.random() * (90 - 17 + 1) + 17 )
 
