@@ -20,7 +20,7 @@
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
     <!-- bulma css & font awesome -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/versions/bulma-no-dark-mode.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
     <style>
@@ -118,7 +118,8 @@
             <nav class="navbar" role="navigation" aria-label="main navigation" x-data="{ isActive: false }">
                 <div class="navbar-brand is-align-items-center">
                     <a class="navbar-item" href="#">
-                        <img src="public/img/logo_p2g.png" alt="Logo">
+                        <img src="https://www.shutterstock.com/image-vector/hunter-x-anime-symbol-vector-600nw-2290030719.jpg" alt="Logo">
+                        <!-- <img src="public/img/logo_p2g.png" alt="Logo"> -->
                     </a>
 
                     <span class="is-hidden-desktop">
@@ -178,6 +179,7 @@
 
     <!-- Pendaftaran -->
     <section class="section p-1" x-show="$store.page === 'pendaftaran' " x-transition >
+        <!-- <template x-if="$store.page === 'pendaftaran'"> -->
         <div class="container">
             <!-- info -->
             <div class="columns no-side-gap is-mobile is-sticky-top mb-2">
@@ -453,10 +455,12 @@
             </div>
             
         </div>        
+        <!-- </template> -->
     </section>
 
     <!-- Daftar hadir -->
     <section class="section p-1" x-show="$store.page === 'daftar hadir'" x-transition >
+        <!-- <template x-if="$store.page === 'daftar hadir' "> -->
         <div class="container">
             <!-- Info -->
             <div class="is-sticky-top has-background-white mb-2">
@@ -686,11 +690,13 @@
             </div>
 
         </div>
+        <!-- </template> -->
     </section>
 
     <!-- Data Pemilih -->
-    <section class="section p-1" x-show="$store.page === 'data pemilih' " x-transition >
-        <div class="container">
+    <section class="section p-1 " x-show="$store.page === 'data pemilih' " x-transition >
+        <!-- <template x-if="$store.page === 'data pemilih' "> -->
+        <div class="container mb-0 pb-0">
             <!-- filter -->
             <div class="py-2 mb-2 is-sticky-top has-background-white ">
                 <div class="columns no-side-gap is-multiline is-mobile is-centered">
@@ -720,7 +726,7 @@
                         <div class="field " :class="{'has-addons' : filterNama}" >
                             <div class="control is-expanded" >
                                 <input class="input" type="text" placeholder="Nama"
-                                x-model="filterNama" x-on:keydown="pageDPT = 1; pageDPTB = 1; pageDPK = 1;" >
+                                x-model.debounce.750="filterNama" x-on:keydown="pageDPT = 1; pageDPTB = 1; pageDPK = 1;" >
                             </div>
 
                             <p class="control" x-show="filterNama" x-transition >
@@ -828,7 +834,7 @@
             </div>
 
             <!-- data -->
-            <div class="columns is-gapless is-multiline is-mobile p-0">
+            <div class="columns is-gapless is-multiline is-mobile m-0 p-0">
                 <!-- DPT -->
                 <div class="column is-full p-0 is-sticky-top" x-show="dataDPT.length > 0 && (filterTipe === 'DPT' || filterTipe === 'SEMUA') " x-transition >
                     <div :class="{'last' : filterTipe != 'SEMUA' || filterNama || (dataDPTB.length == 0 && dataDPK.length == 0) }" class="content-table has-background-warning p-3 pb-5 is-flex is-flex-direction-column"  >                            
@@ -1218,13 +1224,14 @@
             </div>
 
         </div>
+        <!-- </template> -->
     </section>
 
     <!-- Notif and loading -->
     <section class="is-sticky-bottom"  >
         <div class="container p-1">
             <!-- message -->
-            <section class="alert-message "
+            <section class="alert-message mb-1"
             x-show="$store.message.class" x-transition >
                 <div class="notification" :class="`${$store.message.type}`">
                     <button class="delete" @click="$store.message.class = false"></button>

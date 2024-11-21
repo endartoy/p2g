@@ -354,13 +354,23 @@ function ndrtApp() {
             }
         },
 
+
+        // delay filter
+        debounceTimer: null,
+        debounceFilter() {
+            clearTimeout(this.debounceTimer)
+            this.debounceTimer = setTimeout(() => {
+                this.getData
+            }, 300)
+        },
+
         // DPT
         navDPT: { ...initialNav },
         pageDPT: 1,
         infoHadirDPT: { ...initialHadirInfo },
         get dataDPT() {
-            return this.getData(this.dataPemilihByTipe.DPT, this.pageDPT, this.navDPT, this.infoHadirDPT, 
-                this.firstRows, this.maxRows, this.filterNama) 
+            return  this.getData(this.dataPemilihByTipe.DPT, this.pageDPT, this.navDPT, this.infoHadirDPT, 
+                this.firstRows, this.maxRows, this.filterNama)
         },
 
         // DPTB
