@@ -491,7 +491,7 @@
                                 <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
                                 x-model="filterNama" x-on:keyup.debounce.1000="fetchDaftarHadir()" >
                             </div>
-                            <p class="control" x-show="filterNama" @click="filterNama= ''" >
+                            <p class="control" x-show="filterNama" @click="filterNama= ''; fetchDaftarHadir()" >
                                 <button class="button is-transparent" >
                                     <span class="icon">
                                         <i class="fas fa-window-close"></i>

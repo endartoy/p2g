@@ -509,17 +509,19 @@ function ndrtApp() {
                 doc._daftar != null &&
                 doc._panggil == null &&
                 doc._prioritas == true
-            ).sort((a, b) => a._daftar - b._daftar);
+            ).sort((a, b) => a._daftar.seconds - b._daftar.seconds)
 
             return data;
         },
 
         get dataReguler() {
-            const data = this.dataPemilih.filter(doc => 
+            const data = 
+            this.dataPemilih
+            .filter(doc => 
                 doc._daftar != null &&
                 doc._panggil == null &&
                 doc._prioritas == false
-            ).sort((a, b) => a._daftar - b._daftar);
+            ).sort((a, b) => a._daftar.seconds - b._daftar.seconds)
 
             return data;
         },
@@ -707,7 +709,7 @@ function ndrtApp() {
                             });
                         }
 
-                        filteredData = filteredData.sort((a, b) => a._panggil - b._panggil);
+                        filteredData = filteredData.sort((a, b) => a._panggil.seconds - b._panggil.seconds);
 
                         resolve(filteredData); // Resolve with the filtered data
                     }, 1000); 
