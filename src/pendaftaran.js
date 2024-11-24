@@ -214,11 +214,16 @@ function ndrtApp() {
                 : _lastUpdate;
 
             // get old local database
+            if(reset == true) {
+                localStorage.setItem('localDatabase', JSON.stringify({}))
+                console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
+            }
+
             const _local = localStorage.getItem('localDatabase') ?
                 JSON.parse(localStorage.getItem('localDatabase')) :
                 {}
 
-            this.localDatabase = !reset ? _local : {}
+            this.localDatabase = _local
 
             if (this.unsubListener) {
                 this.unsubListener()
@@ -233,7 +238,7 @@ function ndrtApp() {
             .onSnapshot((snapshot) => {
                 try {
                     if (snapshot.docChanges().length > 0) {
-                        // console.log('data baru =>', snapshot.docChanges().length)
+                        console.log('data baru =>', snapshot.docChanges().length)
     
                         snapshot.docs.forEach((doc) => {
                             this.localDatabase[doc.id] = { ...doc.data() }
@@ -890,46 +895,78 @@ function ndrtApp() {
 
         // create dummy data
         dummy(jumlah = prompt('jumlah data ?')){
-            // this.localDatabase = {}
+            this.localDatabase = {}
+            localStorage.setItem('localDatabase', JSON.stringify(this.localDatabase))
+            console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
+ 
+            this.setLastUpdate()
 
-            // fetch('dpt.json')
-            // .then((res) => {
-            //     if (!res.ok) {
-            //         console.log('error')
-            //     } else {
-            //         return res.json()
-            //     }
-            // }).then((res) => {
+            fetch('dpt.json')
+            .then((res) => {
+                if (!res.ok) {
+                    console.log('error')
+                } else {
+                    return res.json()
+                }
+            }).then((res) => {
                 
-            //     let task = db.collection('data_pemilih')
-            //     let data = { ...initialItem }
-            //     data._lastUpdate = new Date()
+                // let task = db.collection('data_pemilih')
+                // let data = { ...initialItem }
+                // data._lastUpdate = new Date()
 
-            //     for (let i = 0; i <= res.length - 1; i++ ) {
+                // for (let i = 0; i <= res.length - 1; i++ ) {
                     
-            //         data.id = 'DPT' + res[i].no_urut.toString().padStart(3, '0');
-            //         data.tipe = 'DPT'
-            //         data.no_urut = res[i].no_urut.toString().padStart(3, '0')
-            //         data.nik = res[i].nik
-            //         data.nama = res[i].nama
-            //         data.alamat = res[i].alamat
-            //         data.jk = res[i].jk
-            //         data.umur = parseInt(res[i].umur)
+                //     data.id = 'DPT' + res[i].no_urut.toString().padStart(3, '0');
+                //     data.tipe = 'DPT'
+                //     data.no_urut = res[i].no_urut.toString().padStart(3, '0')
+                //     data.nik = res[i].nik
+                //     data.nama = res[i].nama
+                //     data.alamat = res[i].alamat
+                //     data.jk = res[i].jk
+                //     data.umur = parseInt(res[i].umur)
 
-            //         const {id, ...dataDummy} = data
+                //     const {id, ...dataDummy} = data
                                     
-            //         task.doc(id).set(dataDummy)
-            //         .then(() => {
-            //             console.log(id)
-            //         })
-            //         .catch((error) => {
-            //             console.log(error)
-            //             i = data.length + 1
-            //         })
+                //     task.doc(id).set(dataDummy)
+                //     .then(() => {
+                //         console.log(id)
+                //     })
+                //     .catch((error) => {
+                //         console.log(error)
+                //         i = data.length + 1
+                //     })
 
-            //     }
+                // }
 
-            // })
+                let task = db.collection('data_pemilih')
+                let item = { ...initialItem }
+                item._lastUpdate = new Date()
+
+                res.forEach((data) => {
+                    item.id = 'DPT' + data.no_urut.toString().padStart(3, '0')
+                    item.tipe = 'DPT'
+                    item.no_urut = data.no_urut.toString().padStart(3, '0')
+                    item.nik = data.nik
+                    item.nama = data.nama
+                    item.alamat = data.alamat
+                    item.jk = data.jk
+                    item.umur = parseInt(data.umur)
+
+                    const {id, ...dataDummy} = item
+                    // console.log(id, dataDummy)
+
+                    task.doc(id).set(dataDummy)
+                    .then(() => {
+                        console.log(dataDummy)
+                    })
+                    .catch((error) => {
+                        console.log(error)
+                    })
+
+
+                })
+
+            })
         }
     }
 }
