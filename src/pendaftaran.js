@@ -227,14 +227,13 @@ function ndrtApp() {
             var isFirstLoad = true
 
             this.unsubListener = db.collection('data_pemilih')
-            // .where('_delete', '==', false)
             .where('_lastUpdate', '>=', this.lastUpdate)
             .orderBy('_lastUpdate')
             .orderBy('no_urut', 'asc')
             .onSnapshot((snapshot) => {
                 try {
                     if (snapshot.docChanges().length > 0) {
-                        console.log('data baru =>', snapshot.docChanges().length)
+                        // console.log('data baru =>', snapshot.docChanges().length)
     
                         snapshot.docs.forEach((doc) => {
                             this.localDatabase[doc.id] = { ...doc.data() }
