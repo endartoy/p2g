@@ -599,7 +599,7 @@ function ndrtApp() {
                 let data = item
                 data._panggil = new Date()
             
-                let message = () => Alpine.store('message').showMessage('Hapus data berhasil')
+                let message = () => Alpine.store('message').showMessage('Succcess')
                 let action = () =>  {
                     this.resetForm('formAksi')
                     Alpine.store('message').showMessage('Done');             
