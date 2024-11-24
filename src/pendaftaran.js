@@ -214,16 +214,11 @@ function ndrtApp() {
                 : _lastUpdate;
 
             // get old local database
-            if(reset == true) {
-                localStorage.setItem('localDatabase', JSON.stringify({}))
-                // console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
-            }
-
             const _local = localStorage.getItem('localDatabase') ?
                 JSON.parse(localStorage.getItem('localDatabase')) :
                 {}
 
-            this.localDatabase = _local
+            this.localDatabase = reset == true ? {} : _local
 
             if (this.unsubListener) {
                 this.unsubListener()
@@ -238,7 +233,7 @@ function ndrtApp() {
             .onSnapshot((snapshot) => {
                 try {
                     if (snapshot.docChanges().length > 0) {
-                        // console.log('data baru =>', snapshot.docChanges().length)
+                        // console.log('data baru =>', snapshot.docChanges())
     
                         snapshot.docs.forEach((doc) => {
                             this.localDatabase[doc.id] = { ...doc.data() }
@@ -894,79 +889,54 @@ function ndrtApp() {
         },
 
         // create dummy data
-        dummy(jumlah = prompt('jumlah data ?')){
-            this.localDatabase = {}
-            localStorage.setItem('localDatabase', JSON.stringify(this.localDatabase))
-            console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
- 
-            this.setLastUpdate()
-
-            fetch('dpt.json')
-            .then((res) => {
-                if (!res.ok) {
-                    console.log('error')
-                } else {
-                    return res.json()
-                }
-            }).then((res) => {
-                
-                // let task = db.collection('data_pemilih')
-                // let data = { ...initialItem }
-                // data._lastUpdate = new Date()
-
-                // for (let i = 0; i <= res.length - 1; i++ ) {
-                    
-                //     data.id = 'DPT' + res[i].no_urut.toString().padStart(3, '0');
-                //     data.tipe = 'DPT'
-                //     data.no_urut = res[i].no_urut.toString().padStart(3, '0')
-                //     data.nik = res[i].nik
-                //     data.nama = res[i].nama
-                //     data.alamat = res[i].alamat
-                //     data.jk = res[i].jk
-                //     data.umur = parseInt(res[i].umur)
-
-                //     const {id, ...dataDummy} = data
-                                    
-                //     task.doc(id).set(dataDummy)
-                //     .then(() => {
-                //         console.log(id)
-                //     })
-                //     .catch((error) => {
-                //         console.log(error)
-                //         i = data.length + 1
-                //     })
-
-                // }
-
-                let task = db.collection('data_pemilih')
-                let item = { ...initialItem }
-                item._lastUpdate = new Date()
-
-                res.forEach((data) => {
-                    item.id = 'DPT' + data.no_urut.toString().padStart(3, '0')
-                    item.tipe = 'DPT'
-                    item.no_urut = data.no_urut.toString().padStart(3, '0')
-                    item.nik = data.nik
-                    item.nama = data.nama
-                    item.alamat = data.alamat
-                    item.jk = data.jk
-                    item.umur = parseInt(data.umur)
-
-                    const {id, ...dataDummy} = item
-                    // console.log(id, dataDummy)
-
-                    task.doc(id).set(dataDummy)
-                    .then(() => {
-                        console.log(dataDummy)
-                    })
-                    .catch((error) => {
-                        console.log(error)
-                    })
-
-
-                })
-
-            })
+        async dummy(jumlah = prompt('Jumlah data?')) {
+            try {
+                // Initialize local database
+                this.localDatabase = {};
+                localStorage.setItem('localDatabase', JSON.stringify(this.localDatabase));
+                console.log('Local database initialized:', JSON.parse(localStorage.getItem('localDatabase')));
+        
+                this.setLastUpdate(); 
+        
+                // data dpt
+                const response = await fetch('dpt.json');
+                if (!response.ok) throw new Error('Failed to fetch dpt.json');
+        
+                const dataFromJson = await response.json();
+                const task = db.collection('data_pemilih');
+        
+                // Process each item from the JSON data
+                const promises = dataFromJson.map((data) => {
+                    const item = {
+                        id: `DPT${data.no_urut.toString().padStart(3, '0')}`,
+                        tipe: 'DPT',
+                        no_urut: data.no_urut.toString().padStart(3, '0'),
+                        nik: data.nik,
+                        nama: data.nama,
+                        alamat: data.alamat,
+                        jk: data.jk,
+                        umur: parseInt(data.umur),
+                        _lastUpdate: new Date(),
+                        _prioritas: false,
+                        _daftar: null,
+                        _panggil: null,
+                        _delete: false,
+                    };
+        
+                    const { id, ...dataDummy } = item;
+        
+                    return task.doc(id).set(dataDummy)
+                        .then(() => console.log('Add:', dataDummy))
+                        .catch((error) => console.error('Error :', error));
+                });
+        
+                // Wait for all Firestore operations to complete
+                await Promise.all(promises);
+                console.log('Oke');
+            } catch (error) {
+                console.error('Error', error);
+            }
         }
+                
     }
 }
