@@ -224,26 +224,43 @@ function ndrtApp() {
                 this.unsubListener()
             }
 
+            var isFirstLoad = true
+
             this.unsubListener = db.collection('data_pemilih')
             // .where('_delete', '==', false)
             .where('_lastUpdate', '>=', this.lastUpdate)
             .orderBy('_lastUpdate')
             .orderBy('no_urut', 'asc')
             .onSnapshot((snapshot) => {
-                // console.log('data baru =>', snapshot.docChanges())
+                try {
+                    if (snapshot.docChanges().length > 0) {
+                        console.log('data baru =>', snapshot.docChanges().length)
+    
+                        snapshot.docs.forEach((doc) => {
+                            this.localDatabase[doc.id] = { ...doc.data() }
+                        })
 
-                snapshot.docs.forEach((doc) => {
-                    this.localDatabase[doc.id] = { ...doc.data() }
-                })
+                        if (!isFirstLoad) {
+                            this.fetchDaftarHadir()
+                        }
+    
+                        // simpan database ke local database
+                        localStorage.setItem('localDatabase', JSON.stringify(this.localDatabase))
+                        // console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
+    
+                        // set new last update date time after do changes
+                        this.setLastUpdate()
+                    }                    
+                } finally {
+                    if (isFirstLoad) {
+                        isFirstLoad = false
 
-                // simpan database ke local database
-                localStorage.setItem('localDatabase', JSON.stringify(this.localDatabase))
-                // console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
+                        this.fetchDaftarHadir()
 
-                // set new last update date time after do changes
-                this.setLastUpdate()
-
-                Alpine.store('isLoading', false)
+                    }
+    
+                    Alpine.store('isLoading', false)
+                }
             }, (error) => {
                 Alpine.store('isLoading', false)
                 Alpine.store('message').showMessage('Error fetching data: ' + error.message, 'error');
@@ -348,16 +365,6 @@ function ndrtApp() {
             if (confirm("Reset local database")) {
                 this.getDataPemilih(true)
             }
-        },
-
-
-        // delay filter
-        debounceTimer: null,
-        debounceFilter() {
-            clearTimeout(this.debounceTimer)
-            this.debounceTimer = setTimeout(() => {
-                this.getData
-            }, 300)
         },
 
         // DPT
@@ -538,10 +545,12 @@ function ndrtApp() {
                     if (this.belumDaftar.length <= 0) {
                         Alpine.store('message').showMessage("Data tidak ditemukan", 'error')
                         this.newSearch.query = ''
+                    } else {
+                        this.$refs.inputFilter.blur()
                     }
 
                     Alpine.store('isLoading', false)
-                }, 500)
+                }, 1500)
             } 
         },
 
@@ -556,6 +565,7 @@ function ndrtApp() {
                 let action = () =>  {                
                     this.newSearch = { ...initialSearch };
                     this.belumDaftar = [];
+                    this.$refs.inputFilter.focus()
                 }
 
                 this.addOrUpdate(data, message, action)
@@ -663,42 +673,52 @@ function ndrtApp() {
             }
         },
 
-        get daftarHadir(){
-            let data = this.dataPemilih.filter(doc => 
-                doc._panggil != null
-            )
+        daftarHadir: [],
+        async fetchDaftarHadir(){
+            Alpine.store('isLoading', true)
+            try {
+                // Simulate async operation
+                const data = await new Promise((resolve) => {
+                    setTimeout(() => {
+                        let filteredData = this.dataPemilih.filter(doc => doc._panggil != null);
 
-            if (this.filterNama) {
-                this.filterJK = false
+                        if (this.filterNama) {
+                            this.filterJK = false;
 
-                data = data.filter(doc => 
-                    doc.nama.includes(this.filterNama.toUpperCase())
-                )
-            } else if (this.filterJK) {
-                this.filterNama = ''
-                data = data.filter(doc => 
-                    doc.jk == this.filterJK
-                )
+                            filteredData = filteredData.filter(doc =>
+                                doc.nama.includes(this.filterNama.toUpperCase())
+                            );
+                        } else if (this.filterJK) {
+                            this.filterNama = '';
+                            filteredData = filteredData.filter(doc => doc.jk == this.filterJK);
+                        }
+
+                        if (!this.filterNama && !this.filterJK) {
+                            this.daftarHadirCount.TOTAL = { L: 0, P: 0 };
+                            Object.keys(this.dataPemilihByTipe).forEach(i => {
+                                this.daftarHadirCount[i] = {
+                                    L: filteredData.filter(doc => doc.tipe == i && doc.jk == 'L').length,
+                                    P: filteredData.filter(doc => doc.tipe == i && doc.jk == 'P').length
+                                };
+
+                                this.daftarHadirCount.TOTAL = {
+                                    L: this.daftarHadirCount.TOTAL.L + this.daftarHadirCount[i].L,
+                                    P: this.daftarHadirCount.TOTAL.P + this.daftarHadirCount[i].P
+                                };
+                            });
+                        }
+
+                        filteredData = filteredData.sort((a, b) => a._panggil - b._panggil);
+
+                        resolve(filteredData); // Resolve with the filtered data
+                    }, 1000); 
+                });
+
+                // return data;
+                this.daftarHadir = data
+            } finally {
+                Alpine.store('isLoading', false)
             }
-
-            if (!this.filterNama && !this.filterJK) {
-                this.daftarHadirCount.TOTAL = {L: 0, P:0 }
-                Object.keys(this.dataPemilihByTipe).forEach(i => {
-                    this.daftarHadirCount[i] = {
-                        L: data.filter(doc => doc.tipe == i && doc.jk == 'L'  ).length,
-                        P: data.filter(doc => doc.tipe == i && doc.jk == 'P'  ).length
-                    }
-
-                    this.daftarHadirCount.TOTAL = {
-                        L: this.daftarHadirCount.TOTAL.L + this.daftarHadirCount[i].L,
-                        P: this.daftarHadirCount.TOTAL.P + this.daftarHadirCount[i].P
-                    }
-                })
-            }
-
-            data = data.sort((a, b) => a._panggil - b._panggil)
-
-            return data
         },
 
         dh_resetForm(q='update'){
@@ -750,12 +770,12 @@ function ndrtApp() {
             let tableDataList = null
             let tableHeaderDataList = [[
                 { content: '#',styles: { halign: 'center' } },
-                { content: 'NO.URUT',styles: { halign: 'center' } },
+                { content: 'NO.URUT',styles: { halign: 'center', cellWidth: 25 } },
                 { content: 'NAMA',styles: { halign: 'center' } },
                 { content: 'JK',styles: { halign: 'center' } }, 
-                { content: 'UMUR',styles: { halign: 'center' } }, 
-                { content: 'ALAMAT',styles: { halign: 'center', cellWidth: 30} },
-                { content: 'KET',styles: { halign: 'center', cellWidth: 30 } }, 
+                // { content: 'UMUR',styles: { halign: 'center' } }, 
+                { content: 'ALAMAT',styles: { halign: 'center', cellWidth: 50} },
+                // { content: 'KET',styles: { halign: 'center', cellWidth: 30 } }, 
             ]]
 
             if (this.daftarHadir.length > 0) {
@@ -765,9 +785,9 @@ function ndrtApp() {
                     { content: res.tipe + ' ' + res.no_urut },
                     res.nama,
                     {content: res.jk, styles: { halign: 'center'}},
-                    {content: res.umur, styles: { halign: 'center'}},
+                    // {content: res.umur, styles: { halign: 'center'}},
                     res.alamat,
-                    this.formatTimestamp(res._panggil)
+                    // this.formatTimestamp(res._panggil)
                 ]);
             } else {
                 tableDataList = [[{ content: 'TIDAK ADA DATA', colSpan: 5, styles: { halign: 'center' } }]];
@@ -796,6 +816,7 @@ function ndrtApp() {
                 },
                 tableWidth: 'auto', // Ensure the table fits within the page
                 // margin: { top: 15, left: 25, right: 25 }, // Add margins
+                margin: { bottom: 20 },
             });
 
             // table info
@@ -870,35 +891,46 @@ function ndrtApp() {
 
         // create dummy data
         dummy(jumlah = prompt('jumlah data ?')){
-            this.localDatabase = {}
+            // this.localDatabase = {}
 
-            let task = db.collection('data_pemilih')
-            let data = { ...initialItem }
-            data._lastUpdate = new Date()
-
-            for (let i = 1; i <= parseInt(jumlah); i++ ) {
+            // fetch('dpt.json')
+            // .then((res) => {
+            //     if (!res.ok) {
+            //         console.log('error')
+            //     } else {
+            //         return res.json()
+            //     }
+            // }).then((res) => {
                 
-                data.id = 'DPT' + i.toString().padStart(3, '0');
-                data.tipe = 'DPT'
-                data.no_urut = i.toString().padStart(3, '0')
-                data.nik = '111122223333000'+i
-                data.nama = 'ABDUL RAHIM ' + i
-                data.alamat = Math.random() > 0.3 ? 'DK GADEN 003/006' : Math.random() > 0.6 ? 'DK PATOMAN 002/003'  : 'DK KARANGJOHO 003/003'
-                data.jk = Math.random() > 0.5 ? 'L' : 'P'
-                data.umur = Math.floor(Math.random() * (90 - 17 + 1) + 17 )
+            //     let task = db.collection('data_pemilih')
+            //     let data = { ...initialItem }
+            //     data._lastUpdate = new Date()
 
-                const {id, ...dataDummy} = data
-                                
-                task.doc(id).set(dataDummy)
-                .then(() => {
-                    console.log("success " + i)
-                })
-                .catch((error) => {
-                    console.log(error)
-                    i = parseInt(jumlah) + 1
-                })
+            //     for (let i = 0; i <= res.length - 1; i++ ) {
+                    
+            //         data.id = 'DPT' + res[i].no_urut.toString().padStart(3, '0');
+            //         data.tipe = 'DPT'
+            //         data.no_urut = res[i].no_urut.toString().padStart(3, '0')
+            //         data.nik = res[i].nik
+            //         data.nama = res[i].nama
+            //         data.alamat = res[i].alamat
+            //         data.jk = res[i].jk
+            //         data.umur = parseInt(res[i].umur)
 
-            }
+            //         const {id, ...dataDummy} = data
+                                    
+            //         task.doc(id).set(dataDummy)
+            //         .then(() => {
+            //             console.log(id)
+            //         })
+            //         .catch((error) => {
+            //             console.log(error)
+            //             i = data.length + 1
+            //         })
+
+            //     }
+
+            // })
         }
     }
 }

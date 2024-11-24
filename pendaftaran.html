@@ -212,12 +212,19 @@
             <!-- info -->
             <div class="columns no-side-gap is-mobile is-sticky-top mb-2">
                 <div class="column is-flex is-align-items-center">
-                    <span class="is-size-4 has-text-weight-semibold ml-4" style="position: absolute !important;">
-                        <span x-text="daftarHadir.length" > 0 </span> / 
-                        <span x-text="dataPemilih.length"> 0 </span >
-                    </span>
+                    <div class="container is-flex is-justify-content-space-between pr-5" style="position: absolute !important;">
+                        <span class="is-size-5 has-text-weight-semibold ml-4">
+                            L : <span x-text="daftarHadirCount.TOTAL.L" > 0 </span> |  
+                            P : <span x-text="daftarHadirCount.TOTAL.P" > 0 </span>
+                        </span>
+                        <span class="is-size-5 has-text-weight-semibold mr-6">
+                            (<span x-text="daftarHadir.length" > 0 </span> / 
+                            <span x-text="dataPemilih.length"> 0 </span >)
+                        </span>
+                    </div>
+
                     <progress class="progress is-large is-primary" style="height: 100%; border-radius: 10px;" 
-                    x-bind:value="daftarHadir.length < 0 ? daftarHadir.length : 1" x-bind:max="dataPemilih.length"> 80% </progress>
+                    x-bind:value="daftarHadir.length > 0 ? daftarHadir.length : 1" x-bind:max="dataPemilih.length"> 80% </progress>
                 </div>
                 <div class="column is-narrow">
                     <div class="field has-addons is-justify-content-end">
@@ -315,7 +322,7 @@
             <div class="modal is-active p-0 m-0" style="display: none;" 
             x-show="form" x-transition >
                 <div class="modal-background"></div>
-                <div class="modal-card m-0" style="height: 90%;">
+                <div class="modal-card" style="height: 90%;">
                     <header class="modal-card-head has-background-primary p-3">
                         <p class="modal-card-title has-text-weight-semibold is-size-5"><span> TAMBAH DATA </span></p>
                         <button class="delete button is-danger" aria-label="close" @click="resetForm()"></button>
@@ -342,7 +349,7 @@
 
                                 <!-- list -->
                                 <template x-if="belumDaftar.length > 0">
-                                    <template x-for="item in belumDaftar" :key="item.id">
+                                    <template x-for="(item) in belumDaftar" :key="item.id">
                                         <table class="table is-narrow is-bordered is-fullwidth mb-1"
                                         :class="{'has-background-warning-light' : item.tipe == 'DPT', 'has-background-primary-light' : item.tipe == 'DPTB', 'has-background-success-light' : item.tipe == 'DPK'}" >
                                             <tbody>
@@ -480,9 +487,9 @@
                 <div class="columns no-side-gap is-mobile is-centered">
                     <div class="column">
                         <div class="field" :class="{'has-addons' : filterNama}">
-                            <div class="control">
+                            <div class="control is-expanded">
                                 <input class="input" type="text" placeholder="Cari Berdasarkan Nama"
-                                x-model.debounce.750="filterNama" >
+                                x-model="filterNama" x-on:keyup.debounce.1000="fetchDaftarHadir()" >
                             </div>
                             <p class="control" x-show="filterNama" @click="filterNama= ''" >
                                 <button class="button is-transparent" >
@@ -572,12 +579,10 @@
 
                             <div class="card has-background-link-light is-shadowless px-2" >
                                 <label class="checkbox is-align-content-center has-text-weight-semibold">
-                                    <input type="checkbox" x-model="f_l" @click="f_l = !f_l; f_p = false" />
-                                    L
+                                    <input type="checkbox" x-model="f_l" @click="f_l = !f_l; f_p = false; fetchDaftarHadir()" /> L
                                 </label>
                                 <label class="checkbox is-align-content-center has-text-weight-semibold ml-2">
-                                    <input type="checkbox" x-model="f_p" @click="f_p = !f_p; f_l = false" />
-                                    P
+                                    <input type="checkbox" x-model="f_p" @click="f_p = !f_p; f_l = false; fetchDaftarHadir()" /> P
                                 </label>
                             </div>
                         </div>
@@ -697,32 +702,32 @@
         <div class="py-2 mb-2 is-sticky-top has-background-white ">
             <div class="columns no-side-gap is-multiline is-mobile is-centered">
                 <div class="column is-flex">
-                    <div class="is-flex">
+                    <div class="buttons is-flex-wrap-nowrap has-addons mr-1 mb-0 p-0">
                         <!-- temp delete item -->
                         <!-- <button class="button mr-1 is-primary" @click="" >
                             <span class="icon"><i class="fas fa-plus"></i></span>
                         </button> -->
 
                         <!-- create dummy data -->
-                        <button x-show="dataPemilih.length <= 0" class="button mr-1 is-primary" @click="if (confirm('Create dummy data ?')) dummy()" >
+                        <!-- <button class="button is-primary" @click="if (confirm('Create dummy data ?')) dummy()" >
                             <span class="icon"><i class="fas fa-plus"></i></span>
-                        </button>
+                        </button> -->
 
                         <!-- reset database -->
-                        <button class="button mr-1 is-danger" @click="resetLocalDatabase()" >
+                        <button class="button is-danger" @click="resetLocalDatabase()" >
                             <span class="icon"><i class="fas fa-sync"></i></span>
                         </button>
 
                         <!-- config pagination  -->
-                        <button class="button mr-1 is-info" @click="config()" >
+                        <button class="button is-info " @click="config()" >
                             <span class="icon"><i class="fas fa-cog"></i></span>
                         </button>
                     </div>
 
                     <div class="field " :class="{'has-addons' : filterNama}" >
-                        <div class="control is-expanded" >
+                        <div class="control " >
                             <input class="input" type="text" placeholder="Nama"
-                            x-model.debounce.750="filterNama" x-on:keydown="pageDPT = 1; pageDPTB = 1; pageDPK = 1;" >
+                            x-model.debounce.1000="filterNama" x-on:keydown="pageDPT = 1; pageDPTB = 1; pageDPK = 1; " >
                         </div>
 
                         <p class="control" x-show="filterNama" x-transition >
@@ -736,7 +741,7 @@
                     </div>
                 </div>
 
-                <div class="column">
+                <div class="column is-narrow">
                     <div class="field has-addons">
                         <div class="control is-expanded">
                             <div class="select is-fullwidth" >
