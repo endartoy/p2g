@@ -216,7 +216,7 @@ function ndrtApp() {
             // get old local database
             if(reset == true) {
                 localStorage.setItem('localDatabase', JSON.stringify({}))
-                console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
+                // console.log('lokal database =>', JSON.parse(localStorage.getItem('localDatabase')))
             }
 
             const _local = localStorage.getItem('localDatabase') ?
@@ -238,7 +238,7 @@ function ndrtApp() {
             .onSnapshot((snapshot) => {
                 try {
                     if (snapshot.docChanges().length > 0) {
-                        console.log('data baru =>', snapshot.docChanges().length)
+                        // console.log('data baru =>', snapshot.docChanges().length)
     
                         snapshot.docs.forEach((doc) => {
                             this.localDatabase[doc.id] = { ...doc.data() }
